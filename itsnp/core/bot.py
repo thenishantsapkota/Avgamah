@@ -51,7 +51,7 @@ class Bot(hikari.GatewayBot):
             description=f"Testing Bot v{__version__} | Now Online",
             timestamp=datetime.now().astimezone(),
         )
-        await self.stdout_channel.send(embed=embed)
+        # await self.stdout_channel.send(embed=embed)
         logging.info("Bot is ready!")
 
     async def on_stopping(self: _ITSNP, event: hikari.StoppingEvent) -> None:
@@ -60,5 +60,5 @@ class Bot(hikari.GatewayBot):
             description=f"Testing Bot v{__version__} | Now Offline",
             timestamp=datetime.now().astimezone(),
         )
-        await self.stdout_channel.send(embed=embed)
+        # await self.stdout_channel.send(embed=embed)
         logging.info("Bot has stopped.")
