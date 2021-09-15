@@ -4,6 +4,9 @@ from datetime import datetime, timedelta
 
 import tanjun
 
+time_regex = re.compile("(?:(\d{1,5})(h|s|m|d))+?")
+time_dict = {"h": 3600, "s": 1, "m": 60, "d": 86400}
+
 ordinal = lambda n: "%d%s" % (
     n,
     "tsnrhtdd"[(math.floor(n / 10) % 10 != 1) * (n % 10 < 4) * n % 10 :: 4],
@@ -85,3 +88,36 @@ class TimeDeltaConverter(tanjun.BaseConverter):
             return timedelta(weeks=1)
         else:
             raise tanjun.CommandError("Unknown time type.")
+
+
+class TimeConverter(tanjun.BaseConverter):
+    async def convert(self, ctx: tanjun.abc.Context, argument: str) -> float:
+        """Function that converts given time into seconds.
+        Parameters
+        ----------
+        ctx : commands.Context
+            Context of the command invokation.
+        argument : str
+            Time to be converted
+        Returns
+        -------
+        float
+            Time in seconds.
+        Raises
+        ------
+        commands.BadArgument
+            When the values are wrong and when the input doesn't match the input regex.
+        """
+        args = argument.lower()
+        matches = re.findall(time_regex, args)
+        time = 0
+        for v, k in matches:
+            try:
+                time += time_dict[k] * float(v)
+            except KeyError:
+                raise tanjun.CommandError(
+                    "{} is an invalid time-key! h/m/s/d are valid!".format(k)
+                )
+            except ValueError:
+                raise tanjun.CommandError("{} is not a number!".format(v))
+        return time
