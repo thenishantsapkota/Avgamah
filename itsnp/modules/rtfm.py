@@ -4,8 +4,10 @@ import aiohttp
 import hikari
 import tanjun
 from hikari import Embed
+from hikari.messages import ButtonStyle
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import create_source_button
 from itsnp.utils.fuzzy import *
 from itsnp.utils.rtfm import *
 
@@ -35,6 +37,7 @@ TARGETS = {
     "wikipedia": "https://wikipedia.readthedocs.io/en/latest",
     "hikari": "https://hikari-py.github.io/hikari/",
     "lightbulb": "https://hikari-lightbulb.readthedocs.io/en/latest/",
+    "nepse-api": "https://nepse-api.readthedocs.io/en/latest/",
 }
 
 ALIASES = {
@@ -61,6 +64,7 @@ ALIASES = {
     ("wiki", "wikipedia"): "wikipedia",
     ("hikari", "bhikari"): "hikari",
     ("lightbulb", "batti"): "lightbulb",
+    ("nepse-api", "samrid"): "nepse-api",
 }
 
 MODULES = list(TARGETS.keys())
@@ -107,17 +111,33 @@ async def rtfm_command(ctx: tanjun.abc.Context, doc: str, *, term: str) -> None:
         await build(target)
         caches = cache.get(target)
 
-    results = finder(term, list(caches.items()), key=lambda x: x[0], lazy=False)[:8]
+    results = finder(term, list(caches.items()), key=lambda x: x[0], lazy=False)[:10]
 
     if not results:
         return await ctx.respond("Couldn't find any results")
 
+    ##Using Buttons
+    # rows = []
+    # for i in range(0, len(results), 5):
+    #     row = ctx.rest.build_action_row()
+    #     for result in results[i: i+5]:
+    #         (
+    #             row.add_button(ButtonStyle.LINK, result[1])
+    #             .set_label(result[0])
+    #             .add_to_container()
+    #         )
+    #     rows.append(row)
+
+    # await ctx.respond(f"**Searched in {target}**", components=rows)
+    ##Using Embeds
+    button = create_source_button(ctx, TARGETS[doc])
     await ctx.respond(
         embed=Embed(
             title=f"Searched in {target}",
             description="\n".join([f"[`{key}`]({url})" for key, url in results]),
             color=0xF1C40F,
-        )
+        ),
+        component=button,
     )
 
 
