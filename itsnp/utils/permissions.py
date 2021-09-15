@@ -1,8 +1,12 @@
 from datetime import datetime
+from typing import Any, Iterable, Optional, TypeVar
+from operator import attrgetter
 
 import hikari
 import lightbulb
 import tanjun
+
+T = TypeVar("T")
 
 from itsnp.core.models import ModerationRoles
 
@@ -17,6 +21,34 @@ class SetModerationRoles(tanjun.CommandError):
 
 class NotHigherRole(tanjun.CommandError):
     pass
+
+
+def get(iterable: Iterable[T], **attrs: Any) -> Optional[T]:
+    """A helper that returns the first element in the iterable that meets
+    all the traits passed in ``attrs``.
+    Args:
+        iterable (Iterable): An iterable to search through.
+        **attrs (Any): Keyword arguments that denote attributes to search with.
+    """
+    attrget = attrgetter
+
+    # Special case the single element call
+    if len(attrs) == 1:
+        k, v = attrs.popitem()
+        pred = attrget(k.replace("__", "."))
+        for elem in iterable:
+            if pred(elem) == v:
+                return elem
+        return None
+
+    converted = [
+        (attrget(attr.replace("__", ".")), value) for attr, value in attrs.items()
+    ]
+
+    for elem in iterable:
+        if all(pred(elem) == value for pred, value in converted):
+            return elem
+    return None
 
 
 class Permissions:
@@ -95,12 +127,35 @@ class Permissions:
     async def log_channel_check(
         self, ctx: tanjun.abc.Context, guild: hikari.Guild
     ) -> hikari.GuildTextChannel:
-        channels = ctx.cache.get_guild_channels_view_for_guild(ctx.guild_id)
-        log_channel = next(
-            filter(
-                lambda channel: channel.name == "mod-logs",
-                ctx.cache.get_guild_channels_view,
-            ),
-            None,
-        )
-        print(log_channel)
+        log_channel = get(await ctx.rest.fetch_guild_channels(guild), name="test")
+        if log_channel is None:
+            log_channel = await guild.create_text_channel(name="test")
+            await log_channel.edit_overwrite(
+                target=guild.get_role(guild.id),
+                deny=hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.SEND_MESSAGES,
+            )
+        return log_channel
+
+    async def muted_role_check(
+        self, ctx: tanjun.abc.Context, guild: hikari.Guild
+    ) -> hikari.Role:
+        muted_role = get(await ctx.rest.fetch_roles(guild), name="Muted")
+        if muted_role is None:
+            muted_role = await ctx.rest.create_role(guild, name="Muted")
+            for channel in await ctx.rest.fetch_guild_channels(guild):
+                await channel.edit_overwrite(
+                    muted_role,
+                    deny=hikari.Permissions.SEND_MESSAGES | hikari.Permissions.SPEAK,
+                )
+        return muted_role
+
+    async def check_higher_role(
+        self, author: hikari.Member, member: hikari.Member
+    ) -> None:
+        author_top_role = author.get_top_role()
+        member_top_role = member.get_top_role()
+
+        if not author_top_role.position > member_top_role.position:
+            raise tanjun.CommandError(
+                "**You cannot run moderation actions on the users on same rank as you or higher than you.<:jhyama:883390821397831701>**"
+            )
