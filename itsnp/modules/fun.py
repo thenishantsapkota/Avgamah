@@ -1,13 +1,15 @@
 import asyncio
-import hikari
-from hikari import Embed
-import aiohttp
 from datetime import datetime
-from hikari.messages import ButtonStyle
+
+import aiohttp
+import hikari
 import tanjun
+from hikari import Embed
 from hikari.interactions.base_interactions import ResponseType
+from hikari.messages import ButtonStyle
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import create_source_button
 
 component = tanjun.Component()
 
@@ -27,12 +29,7 @@ async def cat_command(ctx: tanjun.abc.Context) -> None:
     embed.set_author(name=f"Here's a cat for you!")
     embed.set_image(cat_json["image"])
     embed.set_footer(text=f"Requested by {ctx.author}")
-    button = (
-        ctx.rest.build_action_row()
-        .add_button(ButtonStyle.LINK, "https://some-random-api.ml/")
-        .set_label("Source")
-        .add_to_container()
-    )
+    button = create_source_button(ctx, "https://some-random-api.ml/")
 
     await ctx.respond(embed=embed, component=button)
 
@@ -52,12 +49,31 @@ async def dog_command(ctx: tanjun.abc.Context) -> None:
     embed.set_author(name=f"Here's a dog for you!")
     embed.set_image(dog_json["image"])
     embed.set_footer(text=f"Requested by {ctx.author}")
-    button = (
-        ctx.rest.build_action_row()
-        .add_button(ButtonStyle.LINK, "https://some-random-api.ml/")
-        .set_label("Source")
-        .add_to_container()
+    button = create_source_button(ctx, "https://some-random-api.ml/")
+
+    await ctx.respond(embed=embed, component=button)
+
+
+@component.with_slash_command
+@tanjun.with_str_slash_option("term", "Term to Search for")
+@tanjun.as_slash_command("urban", "Search a term on urban dictionary", default_to_ephemeral=True)
+async def urban_command(ctx: tanjun.abc.Context, term: str) -> None:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            f"https://api.urbandictionary.com/v0/define?term={term}"
+        ) as resp:
+            raw = await resp.json()
+
+    urban_data = raw["list"]
+    if not urban_data:
+        return await ctx.respond("No Results :(")
+    embed = Embed(
+        title=f"Definition for {term}",
+        description=f"{urban_data[0]['definition']}\n\n**Example** - {urban_data[0]['example']}",
+        color=0x00FF00,
+        timestamp=datetime.now().astimezone(),
     )
+    button = create_source_button(ctx, "https://api.urbandictionary.com")
 
     await ctx.respond(embed=embed, component=button)
 
