@@ -1,21 +1,18 @@
-import hikari
-from hikari import Embed
-from hikari.messages import ButtonStyle
-import tanjun
 from datetime import datetime
 
-from itsnp.core.client import Client
-from itsnp.core.models import SuggestionModel
+import hikari
+import tanjun
+from hikari import Embed
 
+from itsnp.core.client import Client
 
 component = tanjun.Component()
 
-suggestion_group = tanjun.slash_command_group("suggestion", "Suggestion command group.")
 
-
-@suggestion_group.with_command
+@component.with_slash_command
+@tanjun.with_own_permission_check(hikari.Permissions.ADD_REACTIONS)
 @tanjun.with_str_slash_option("suggestion", "A suggestion.")
-@tanjun.as_slash_command("give", "Give a suggestion for the server.")
+@tanjun.as_slash_command("suggest", "Give a suggestion for the server.")
 async def add_suggestion_command(ctx: tanjun.abc.Context, *, suggestion: str) -> None:
     emojis = ["✅", "❌"]
     embed = Embed(
@@ -29,7 +26,9 @@ async def add_suggestion_command(ctx: tanjun.abc.Context, *, suggestion: str) ->
         await msg.add_reaction(emoji)
 
 
-@suggestion_group.with_command
+@component.with_slash_command
+@tanjun.with_own_permission_check(hikari.Permissions.MANAGE_MESSAGES)
+@tanjun.with_own_permission_check(hikari.Permissions.MANAGE_MESSAGES)
 @tanjun.with_author_permission_check(hikari.Permissions.MANAGE_GUILD)
 @tanjun.with_str_slash_option("message_id", "Message ID of the suggestion")
 @tanjun.as_slash_command("approve", "Approve the suggestion", default_to_ephemeral=True)
@@ -47,7 +46,8 @@ async def approve_command(ctx: tanjun.abc.Context, message_id: str) -> None:
     await response.delete()
 
 
-@suggestion_group.with_command
+@component.with_slash_command
+@tanjun.with_own_permission_check(hikari.Permissions.MANAGE_MESSAGES)
 @tanjun.with_author_permission_check(hikari.Permissions.MANAGE_GUILD)
 @tanjun.with_str_slash_option("message_id", "Message ID of the suggestion")
 @tanjun.with_str_slash_option("reason", "Reason for denial of the suggestion")
@@ -67,9 +67,6 @@ async def deny_command(
     await msg.remove_all_reactions()
     response = await ctx.respond("Done :ok_hand:", ensure_result=True)
     await response.delete()
-
-
-component.add_slash_command(suggestion_group)
 
 
 @tanjun.as_loader
