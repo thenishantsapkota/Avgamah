@@ -1,10 +1,10 @@
 import asyncio
 import typing as t
+from datetime import datetime
 
 import hikari
 import tanjun
 from hikari import Embed
-from datetime import datetime
 
 from itsnp.core.client import Client
 from itsnp.core.models import TagModel
@@ -19,7 +19,7 @@ tag_group = tanjun.slash_command_group("tag", "Tag slash command group")
 @tanjun.with_str_slash_option("name", "Name of the tag you want to store.")
 @tanjun.as_slash_command("add", "Add a tag to the database.")
 async def add_tag_command(ctx: tanjun.abc.Context, name: str, *, value: str) -> None:
-    model, _ = await TagModel.get_or_create(guild_id=ctx.guild_id, name_tag = name)
+    model, _ = await TagModel.get_or_create(guild_id=ctx.guild_id, name_tag=name)
     model.name_tag = name
     model.tag_value = value
     await model.save()
@@ -71,6 +71,7 @@ async def delete_tag(ctx: tanjun.abc.Context, name: str) -> None:
 
 
 component.add_slash_command(tag_group)
+
 
 @tanjun.as_loader
 def load_component(client: Client) -> None:
