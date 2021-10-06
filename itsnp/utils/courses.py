@@ -43,8 +43,3 @@ class Courses:
             "direct_link": link,
         }
         return result
-
-
-if __name__ == "__main__":
-    obj = Courses()
-    asyncio.run(obj.get_course("python"))

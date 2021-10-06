@@ -95,7 +95,7 @@ class TimeConverter(tanjun.BaseConverter):
         """Function that converts given time into seconds.
         Parameters
         ----------
-        ctx : commands.Context
+        ctx : tanjun.abc.Context
             Context of the command invokation.
         argument : str
             Time to be converted
@@ -105,7 +105,7 @@ class TimeConverter(tanjun.BaseConverter):
             Time in seconds.
         Raises
         ------
-        commands.BadArgument
+        tanjun.CommandError
             When the values are wrong and when the input doesn't match the input regex.
         """
         args = argument.lower()

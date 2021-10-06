@@ -14,7 +14,7 @@ tortoise_config = {
     },
     "apps": {
         "main": {
-            "models": ["itsnp.core.models", "aerich.models"],
+            "models": ["models", "aerich.models"],
             "default_connection": "default",
         }
     },

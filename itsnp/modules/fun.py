@@ -1,12 +1,8 @@
-import asyncio
 from datetime import datetime
 
 import aiohttp
-import hikari
 import tanjun
 from hikari import Embed
-from hikari.interactions.base_interactions import ResponseType
-from hikari.messages import ButtonStyle
 
 from itsnp.core.client import Client
 from itsnp.utils.buttons import create_source_button
@@ -56,7 +52,9 @@ async def dog_command(ctx: tanjun.abc.Context) -> None:
 
 @component.with_slash_command
 @tanjun.with_str_slash_option("term", "Term to Search for")
-@tanjun.as_slash_command("urban", "Search a term on urban dictionary", default_to_ephemeral=True)
+@tanjun.as_slash_command(
+    "urban", "Search a term on urban dictionary", default_to_ephemeral=True
+)
 async def urban_command(ctx: tanjun.abc.Context, term: str) -> None:
     async with aiohttp.ClientSession() as session:
         async with session.get(

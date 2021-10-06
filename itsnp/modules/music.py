@@ -1,22 +1,21 @@
 import collections
-import re
-from datetime import date, datetime, timedelta
 import random
+import re
+import typing as t
+from datetime import date, datetime, timedelta
 
 import hikari
-import typing
-from tanjun.clients import as_loader
-import yuyo
 import lavasnek_rs
 import tanjun
+import yuyo
 from hikari import Embed
+from tanjun.clients import as_loader
 
-from itsnp.core import Client
-from itsnp.core import Bot
+from itsnp.core import Bot, Client
 from itsnp.utils.time import *
+from itsnp.utils.utilities import _chunk
 
 component = tanjun.Component()
-_ValueT = typing.TypeVar("_ValueT")
 
 
 URL_REGEX = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
@@ -166,16 +165,6 @@ async def pause(ctx: tanjun.abc.Context) -> None:
     embed = Embed(title="⏸️ Playback Paused", color=0xFF0000)
     await ctx.respond(embed=embed)
 
-def _chunk(iterator: collections.Iterator[_ValueT], max:int) -> collections.Iterator[list[_ValueT]]:
-    chunk: list[_ValueT] = []
-    for entry in iterator:
-        chunk.append(entry)
-        if len(chunk) == max:
-            yield chunk
-            chunk = []
-    
-    if chunk:
-        yield chunk
 
 @component.with_slash_command
 @tanjun.as_slash_command("queue", "Shows the music queue")
@@ -190,30 +179,35 @@ async def queue(ctx: tanjun.abc.Context) -> None:
             song_queue += [
                 f"[{song.track.info.title}]({song.track.info.uri}) [<@{song.requester}>]"
             ]
-    
-        
+
         fields = (
             (
                 hikari.UNDEFINED,
                 hikari.Embed(
-                    description= "\n".join(track),
-                    color = 0x00ff00,
+                    description="\n".join(track),
+                    color=0x00FF00,
                     title=f"Queue for {ctx.get_guild()}",
-                    timestamp=datetime.now().astimezone()
-                ).set_footer(text=f"Page {index+1}").add_field(
-            name="Now Playing",
-            value=f"[{node.now_playing.track.info.title}]({node.now_playing.track.info.uri}) [<@{node.now_playing.requester}>]",
-        ),
+                    timestamp=datetime.now().astimezone(),
+                )
+                .set_footer(text=f"Page {index+1}")
+                .add_field(
+                    name="Now Playing",
+                    value=f"[{node.now_playing.track.info.title}]({node.now_playing.track.info.uri}) [<@{node.now_playing.requester}>]",
+                ),
             )
-            for index, track in enumerate(_chunk(song_queue,10))
+            for index, track in enumerate(_chunk(song_queue, 10))
         )
-       
-        paginator = yuyo.ComponentPaginator(fields, authors= (ctx.author.id,))
+
+        paginator = yuyo.ComponentPaginator(fields, authors=(ctx.author.id,))
+        yuyo.ComponentExecutor(timeout=timedelta(seconds=60))
         if first_response := await paginator.get_next_entry():
             content, embed = first_response
-            message = await ctx.respond(content=content, component=paginator, embed=embed, ensure_result=True)
+            message = await ctx.respond(
+                content=content, component=paginator, embed=embed, ensure_result=True
+            )
             ctx.shards.component_client.add_executor(message, paginator)
             return
+
 
 @component.with_slash_command
 @tanjun.as_slash_command("resume", "Resume the song that is paused")
@@ -268,24 +262,25 @@ async def skip(ctx: tanjun.abc.Context) -> None:
 
     await ctx.respond(embed=em)
 
-# @component.with_slash_command
-# @tanjun.as_slash_command("shuffle", "Shuffle the current queue")
-# async def shuffle(ctx: tanjun.abc.Context) -> None:
-#     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
-#     queue = node.queue
-#     random.shuffle(queue)
 
-#     await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
+@component.with_slash_command
+@tanjun.as_slash_command("shuffle", "Shuffle the current queue")
+async def shuffle(ctx: tanjun.abc.Context) -> None:
+    node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    if not len(node.queue) > 1:
+        return ctx.respond("Only one song in the queue!")
 
-#     embed = hikari.Embed(
-#         title="🔀 Shuffled Queue",
-#         color = 0x00ff00
-#     )
-#     await ctx.respond(embed=embed)
+    queue = node.queue[1:]
+    random.shuffle(queue)
 
+    queue.insert(0, node.queue[0])
 
+    node.queue = queue
+    await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
 
-    
+    embed = hikari.Embed(title="🔀 Shuffled Queue", color=0x00FF00)
+    await ctx.respond(embed=embed)
+
 
 @tanjun.as_loader
 def load_component(client: Client) -> None:

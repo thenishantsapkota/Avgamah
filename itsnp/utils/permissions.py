@@ -1,14 +1,12 @@
-from datetime import datetime
-from typing import Any, Iterable, Optional, TypeVar
 from operator import attrgetter
+from typing import Any, Iterable, Optional, TypeVar, Union
 
 import hikari
-import lightbulb
 import tanjun
 
 T = TypeVar("T")
 
-from itsnp.core.models import ModerationRoles
+from models import ModerationRoles
 
 
 class NotEnoughPermissions(tanjun.CommandError):
@@ -97,7 +95,7 @@ class Permissions:
             or await self.rolecheck(ctx.member, staff_role)
         ):
             raise tanjun.CommandError(
-                f"You don't have the required permissions or,\nYou don't have {staff_role.mention} role to run this command.<:jhyama:883390821397831701>"
+                f"You don't have the required permissions or,\nYou don't have {staff_role.mention} role to run this command.<:jhyama:889855700229058640>"
             )
 
     async def mod_role_check(
@@ -109,7 +107,7 @@ class Permissions:
             or await self.rolecheck(ctx.member, mod_role)
         ):
             raise tanjun.CommandError(
-                f"You don't have the required permissions or,\nYou don't have {mod_role.mention} role to run this command.<:jhyama:883390821397831701>"
+                f"You don't have the required permissions or,\nYou don't have {mod_role.mention} role to run this command.<:jhyama:889855700229058640>"
             )
 
     async def admin_role_check(
@@ -121,15 +119,61 @@ class Permissions:
             or await self.rolecheck(ctx.member, admin_role)
         ):
             raise tanjun.CommandError(
-                f"You don't have the required permissions or,\nYou don't have {admin_role.mention} role to run this command.<:jhyama:883390821397831701>"
+                f"You don't have the required permissions or,\nYou don't have {admin_role.mention} role to run this command.<:jhyama:889855700229058640>"
             )
 
     async def log_channel_check(
         self, ctx: tanjun.abc.Context, guild: hikari.Guild
     ) -> hikari.GuildTextChannel:
-        log_channel = get(await ctx.rest.fetch_guild_channels(guild), name="test")
+        log_channel = get(await ctx.rest.fetch_guild_channels(guild), name="mod-logs")
         if log_channel is None:
-            log_channel = await guild.create_text_channel(name="test")
+            log_channel = await guild.create_text_channel(name="mod-logs")
+            await log_channel.edit_overwrite(
+                target=guild.get_role(guild.id),
+                deny=hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.SEND_MESSAGES,
+            )
+        return log_channel
+
+    async def member_logging_check(
+        self, guild: hikari.Guild
+    ) -> hikari.GuildTextChannel:
+        log_channel = get(guild.get_channels(), name="member-logs")
+        if log_channel is None:
+            log_channel = await guild.create_text_channel(name="member-logs")
+            await log_channel.edit_overwrite(
+                target=guild.get_role(guild.id),
+                deny=hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.SEND_MESSAGES,
+            )
+        return log_channel
+
+    async def server_logging_check(
+        self, guild: hikari.Guild
+    ) -> hikari.GuildTextChannel:
+        log_channel = get(guild.get_channels(), name="server-logs")
+        if log_channel is None:
+            log_channel = await guild.create_text_channel(name="server-logs")
+            await log_channel.edit_overwrite(
+                target=guild.get_role(guild.id),
+                deny=hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.SEND_MESSAGES,
+            )
+        return log_channel
+
+    async def voice_logging_check(self, guild: hikari.Guild) -> hikari.GuildTextChannel:
+        log_channel = get(guild.get_channels(), name="voice-logs")
+        if log_channel is None:
+            log_channel = await guild.create_text_channel(name="voice-logs")
+            await log_channel.edit_overwrite(
+                target=guild.get_role(guild.id),
+                deny=hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.SEND_MESSAGES,
+            )
+        return log_channel
+
+    async def message_logging_check(
+        self, guild: hikari.Guild
+    ) -> hikari.GuildTextChannel:
+        log_channel = get(guild.get_channels(), name="message-logs")
+        if log_channel is None:
+            log_channel = await guild.create_text_channel(name="message-logs")
             await log_channel.edit_overwrite(
                 target=guild.get_role(guild.id),
                 deny=hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.SEND_MESSAGES,
@@ -157,5 +201,13 @@ class Permissions:
 
         if not author_top_role.position > member_top_role.position:
             raise tanjun.CommandError(
-                "**You cannot run moderation actions on the users on same rank as you or higher than you.<:jhyama:883390821397831701>**"
+                "**You cannot run moderation actions on the users on same rank as you or higher than you.<:jhyama:889855700229058640>**"
             )
+
+    async def check_booster_role(
+        self, member: hikari.Member
+    ) -> Union[hikari.Role, None]:
+        for role in member.get_roles():
+            if role.is_premium_subscriber_role:
+                booster_role = role
+                return booster_role

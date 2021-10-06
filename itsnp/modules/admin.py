@@ -4,8 +4,9 @@ import hikari
 import tanjun
 from hikari import Embed
 
+from itsnp.core.bot import Bot
 from itsnp.core.client import Client
-from itsnp.core.models import ModerationRoles
+from models import ModerationRoles
 
 component = tanjun.Component()
 
@@ -76,8 +77,8 @@ async def list_command(ctx: tanjun.abc.Context) -> None:
     guild = ctx.get_guild()
     model = await ModerationRoles.get_or_none(guild_id=guild.id)
     if model is None:
-        await ctx.send("No data found.")
-        return
+        return await ctx.respond("No data found.")
+
     embed = Embed(
         color=hikari.Color(0x00FF00),
         timestamp=datetime.now().astimezone(),
@@ -93,6 +94,14 @@ async def list_command(ctx: tanjun.abc.Context) -> None:
     embed.set_author(name=f"Staff Roles for {guild.name}", icon=guild.icon_url)
     embed.set_footer(text=f"Invoked by {ctx.author}")
     await ctx.respond(embed=embed)
+
+
+@component.with_slash_command
+@tanjun.with_owner_check
+@tanjun.as_slash_command("shutdown", "Shutdown the bot(Only for owner)!")
+async def shutdown_command(ctx: tanjun.abc.Context):
+    await ctx.respond("Bot is Stopping.....Good Bye!")
+    await Bot.close()
 
 
 component.add_slash_command(role_group)

@@ -141,3 +141,8 @@ cython_debug/
 __pycache__/
 migrations/
 aerich.ini
+.vscode/
+settings.json
+itsnp/modules/embeds.py
+git-completion.bash
+bot.py.bak

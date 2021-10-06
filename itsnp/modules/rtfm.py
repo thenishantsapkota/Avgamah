@@ -1,10 +1,8 @@
 import warnings
 
 import aiohttp
-import hikari
 import tanjun
 from hikari import Embed
-from hikari.messages import ButtonStyle
 
 from itsnp.core.client import Client
 from itsnp.utils.buttons import create_source_button

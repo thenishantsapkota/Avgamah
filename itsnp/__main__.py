@@ -1,6 +1,8 @@
 import os
 
-from itsnp.core.bot import Bot
+from itsnp.core import Bot
+
+bot = Bot()
 
 if os.name != "nt":
     import uvloop
@@ -8,5 +10,4 @@ if os.name != "nt":
     uvloop.install()
 
 if __name__ == "__main__":
-    bot = Bot()
     bot.run()

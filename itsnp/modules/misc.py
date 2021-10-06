@@ -1,7 +1,6 @@
 import os
 import random
 from datetime import datetime, timedelta
-from http.cookiejar import CookiePolicy
 from platform import python_version
 from time import time
 
@@ -10,10 +9,11 @@ import hikari
 import tanjun
 from hikari import Embed
 from hikari import __version__ as hikari_version
-from hikari.internal.routes import GET_GUILD_ROLES
 from hikari.messages import ButtonStyle
+from lightbulb import __version__ as lighbulb_version
 from psutil import Process, virtual_memory
 from tanjun import __version__ as tanjun_version
+from tanjun import components
 
 from itsnp import __version__ as bot_version
 from itsnp.core.client import Client
@@ -223,7 +223,7 @@ async def botinfo_command(ctx: tanjun.abc.Context) -> None:
         title=f"{await ctx.rest.fetch_my_user()}'s Information",
         color=0xF1C40F,
         timestamp=datetime.now().astimezone(),
-        description=f"```Language : Python\nPython Version : {python_version()}\nBot Version : {bot_version}\nLibrary : hikari.py\nCommand Handler : hikari-tanjun\nHikari Version : {hikari_version}\nTanjun Version : {tanjun_version}\nUptime : {pretty_uptime}\nCPU Time : {pretty_cpu_time}\nMemory Usage : {mem_usage:,.3f} MiB /{mem_total:,.0f} MiB\nPrefix : /\nClient ID : {bot.id}```",
+        description=f"```Language : Python\nPython Version : {python_version()}\nBot Version : {bot_version}\nLibrary : hikari.py\nCommand Handler :\nhikari-tanjun(Slash Commands)\nhikari-lightbulb(Message Commands)\nHikari Version : {hikari_version}\nTanjun Version : {tanjun_version}\nLightbulb Version : {lighbulb_version}\nUptime : {pretty_uptime}\nCPU Time : {pretty_cpu_time}\nMemory Usage : {mem_usage:,.3f} MiB /{mem_total:,.0f} MiB\nPrefix : /\nClient ID : {bot.id}```",
     )
     embed.set_thumbnail(bot.avatar_url)
     fields = [("Owner <:crown:879222224438059049>", f"<@852617608309112882>")]
@@ -328,10 +328,10 @@ async def weather_command(ctx: tanjun.abc.Context, *, city: str) -> None:
             except KeyError:
                 return await ctx.respond("No City was found :(")
         embed = Embed(
-        color=0xF1C40F,
-        timestamp=datetime.now().astimezone(),
-        title=f"Weather of {city.title()}",
-    )
+            color=0xF1C40F,
+            timestamp=datetime.now().astimezone(),
+            title=f"Weather of {city.title()}",
+        )
 
     fields = [
         ("Temperature", f"{temperature_in_celcius} °C", True),
@@ -386,6 +386,16 @@ async def ipinfo_command(ctx: tanjun.abc.Context, ip: str) -> None:
     button = create_source_button(ctx, "http://ip-api.com/")
 
     await ctx.respond(embed=embed, component=button)
+
+
+@component.with_slash_command
+@tanjun.as_slash_command("botinvite", "Invite Link for the bot")
+async def botinvite_command(ctx: tanjun.abc.Context) -> None:
+    """Sends a invite link for the bot"""
+    bot_user = await ctx.rest.fetch_my_user()
+    await ctx.respond(
+        f"https://discord.com/api/oauth2/authorize?client_id={bot_user.id}&permissions=8&scope=bot%20applications.commands"
+    )
 
 
 @tanjun.as_loader

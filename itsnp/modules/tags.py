@@ -7,7 +7,7 @@ import tanjun
 from hikari import Embed
 
 from itsnp.core.client import Client
-from itsnp.core.models import TagModel
+from models import TagModel
 
 component = tanjun.Component()
 
