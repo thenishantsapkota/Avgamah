@@ -20,10 +20,12 @@ psutil = "^5.8.0"
 hikari-lightbulb = {git = "https://github.com/tandemdude/hikari-lightbulb"}
 hikari-yuyo = {git= "https://github.com/FasterSpeeding/Yuyo"}
 lavasnek-rs = {git = "https://github.com/vicky5124/lavasnek_rs"}
+nepali-date = "^2.0.5"
 
 [tool.poetry.dev-dependencies]
 black = "^21.9b0"
 isort = "^5.9.3"
+pre-commit = "^2.15.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
