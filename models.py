@@ -90,3 +90,25 @@ class WarningsModel(Model):
 
         table = "warnings"
         table_description = "Stores Per Guild Warnings"
+
+
+class MemberJoinModel(Model):
+
+    channel_id = fields.BigIntField(null=True)
+    guild_id = fields.BigIntField(pk=True)
+    welcome_message = fields.TextField(null=True)
+    base_role_id = fields.BigIntField(null=True)
+
+    class Meta:
+        table = "memberinfo"
+        table_description = "Stores the Welcome channel and Welcome Message of the bot."
+
+
+class JoinToCreate(Model):
+    id = fields.IntField(pk=True)
+    member_id = fields.BigIntField(null=True)
+    channel_id = fields.BigIntField(null=True)
+
+    class Meta:
+        table = "voice_channels"
+        table_description = "Stores info about voice channels created."
