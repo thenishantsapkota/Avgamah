@@ -1,17 +1,13 @@
 from __future__ import annotations
+
 import asyncio
-from datetime import datetime, time, timedelta, timezone
-from logging import warn
+from datetime import datetime, timedelta
 from typing import Optional
-from tanjun.commands import as_slash_command
-import yuyo
 
 import hikari
-from hikari.events import message_events
 import tanjun
+import yuyo
 from hikari.embeds import Embed
-from tanjun import components
-from tanjun.checks import guild_check
 
 from itsnp.core.client import Client
 from itsnp.utils.permissions import Permissions
@@ -21,7 +17,6 @@ from models import MuteModel, WarningsModel
 
 component = tanjun.Component()
 
-MAX_TIME_MESSAGE_DELETE = timedelta(weeks=2)
 
 permissions = Permissions()
 
