@@ -6,6 +6,7 @@ from time import time
 
 import aiohttp
 import hikari
+import nepali_date
 import tanjun
 from hikari import Embed
 from hikari import __version__ as hikari_version
@@ -240,64 +241,6 @@ async def botinfo_command(ctx: tanjun.abc.Context) -> None:
         .add_to_container()
     )
 
-    await ctx.respond(embed=embed, component=button)
-
-
-@component.with_slash_command
-@tanjun.with_str_slash_option("country", "A country's name")
-@tanjun.as_slash_command("countryinfo", "Get info about a country")
-async def countryinfo_command(ctx: tanjun.abc.Context, *, country: str) -> None:
-    async with aiohttp.ClientSession() as session:
-        async with session.get(
-            f"https://restcountries.eu/rest/v2/name/{country}"
-        ) as resp:
-            info = await resp.json()
-            try:
-                country_name = info[0]["name"]
-                top_level_domainn = info[0]["topLevelDomain"]
-                top_level_domain = ",".join(top_level_domainn)
-                alpha_2_code = info[0]["alpha2Code"]
-                calling_codes_list = info[0]["callingCodes"]
-                calling_codes = ",".join(calling_codes_list)
-                capital = info[0]["capital"]
-                region = info[0]["region"]
-                population = info[0]["population"]
-                native_name = info[0]["nativeName"]
-                time_zones_list = info[0]["timezones"]
-                time_zones = ",".join(time_zones_list)
-                currencies = info[0]["currencies"]
-                currency_code = currencies[0]["code"]
-                currency_symbol = currencies[0]["symbol"]
-                alternative_spellings_list = info[0]["altSpellings"]
-                alternative_spellings = ",".join(alternative_spellings_list)
-            except KeyError:
-                return await ctx.respond("No Country found :(")
-    embed = Embed(
-        color=0xF1C40F,
-        timestamp=datetime.now().astimezone(),
-        title=f"Info of {country_name}",
-    )
-    fields = [
-        ("Name", country_name, True),
-        ("Capital", capital, True),
-        ("Top Level Domain", top_level_domain, True),
-        ("Alpha2 Code", alpha_2_code, True),
-        ("Calling Codes", calling_codes, True),
-        ("Region", region, True),
-        ("Population", population, True),
-        ("Native Name", native_name, True),
-        ("Time Zones", time_zones, True),
-        ("Currency Code", currency_code, True),
-        ("Currency Symbol", currency_symbol, True),
-        ("Alternative Spellings", alternative_spellings, True),
-    ]
-
-    for name, value, inline in fields:
-        embed.add_field(name=name, value=value, inline=inline)
-
-    embed.set_thumbnail(f"https://flagcdn.com/w80/{str(alpha_2_code).lower()}.png")
-    embed.set_footer(text=f"Requested by {ctx.author}")
-    button = create_source_button(ctx, "https://restcountries.eu")
     await ctx.respond(embed=embed, component=button)
 
 
