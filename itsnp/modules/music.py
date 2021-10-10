@@ -1,14 +1,14 @@
-import collections
 import random
 import re
-import typing as t
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
+import aiohttp
 import hikari
 import lavasnek_rs
 import tanjun
 import yuyo
 from hikari import Embed
+from StringProgressBar import progressBar
 from tanjun.clients import as_loader
 
 from itsnp.core import Bot, Client
@@ -128,6 +128,18 @@ async def now_playing(ctx: tanjun.abc.Context) -> None:
     if not node or not node.now_playing:
         return await ctx.respond("There's nothing playing at the moment!")
 
+    song_length = pretty_timedelta(
+        timedelta(seconds=float(node.now_playing.track.info.length) / 1000)
+    )
+
+    current_position = pretty_timedelta(
+        timedelta(seconds=float(node.now_playing.track.info.position) / 1000)
+    )
+
+    progress_bar = progressBar.createBoxDiscord(
+        node.now_playing.track.info.position, node.now_playing.track.info.length, 15
+    )
+
     embed = Embed(
         title="Now Playing",
         description=f"[{node.now_playing.track.info.title}]({node.now_playing.track.info.uri})",
@@ -137,11 +149,9 @@ async def now_playing(ctx: tanjun.abc.Context) -> None:
         ("Requested by", f"<@{node.now_playing.requester}>", True),
         ("Author", node.now_playing.track.info.author, True),
         (
-            "Length",
-            pretty_timedelta(
-                timedelta(seconds=float(node.now_playing.track.info.length) / 1000)
-            ),
-            True,
+            "Progress",
+            f"{progress_bar}\n**{current_position if current_position else 0}/{song_length}**",
+            False,
         ),
     ]
     for name, value, inline in fields:
@@ -184,7 +194,7 @@ async def queue(ctx: tanjun.abc.Context) -> None:
             (
                 hikari.UNDEFINED,
                 hikari.Embed(
-                    description="\n".join(track),
+                    description=f"\n".join(track),
                     color=0x00FF00,
                     title=f"Queue for {ctx.get_guild()}",
                     timestamp=datetime.now().astimezone(),
@@ -198,8 +208,9 @@ async def queue(ctx: tanjun.abc.Context) -> None:
             for index, track in enumerate(_chunk(song_queue, 10))
         )
 
-        paginator = yuyo.ComponentPaginator(fields, authors=(ctx.author.id,))
-        yuyo.ComponentExecutor(timeout=timedelta(seconds=60))
+        paginator = yuyo.ComponentPaginator(
+            fields, authors=(ctx.author.id,), timeout=timedelta(seconds=60)
+        )
         if first_response := await paginator.get_next_entry():
             content, embed = first_response
             message = await ctx.respond(
@@ -243,7 +254,7 @@ async def volume(ctx: tanjun.abc.Context, volume: int) -> None:
 
 
 @component.with_slash_command
-@tanjun.as_slash_command("skip", "Skip's the current song")
+@tanjun.as_slash_command("skip", "Skips the current song")
 async def skip(ctx: tanjun.abc.Context) -> None:
 
     skip = await ctx.shards.data.lavalink.skip(ctx.guild_id)
@@ -279,6 +290,67 @@ async def shuffle(ctx: tanjun.abc.Context) -> None:
     await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
 
     embed = hikari.Embed(title="🔀 Shuffled Queue", color=0x00FF00)
+    await ctx.respond(embed=embed)
+
+
+@component.with_slash_command
+@tanjun.as_slash_command("lyrics", "Get lyrics of Currently playing song")
+async def lyrics(ctx: tanjun.abc.Context) -> None:
+    node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    if not node.now_playing:
+        return await ctx.respond("There's nothing playing at the moment!")
+    song_name = node.now_playing.track.info.title
+    async with aiohttp.request(
+        "GET", f"https://some-random-api.ml/lyrics?title={song_name}", headers={}
+    ) as r:
+        if not 200 <= r.status <= 299:
+            raise tanjun.CommandError("No Lyrics found.")
+        data = await r.json()
+
+    lyrics = str(data["lyrics"])
+    iterator = lyrics.splitlines()
+
+    fields = (
+        (
+            hikari.UNDEFINED,
+            hikari.Embed(
+                description="\n".join(lyric),
+                color=0x00FF00,
+                timestamp=datetime.now().astimezone(),
+            )
+            .set_footer(text=f"Page {index+1}")
+            .set_author(name=f"{song_name}", url=f"{node.now_playing.track.info.uri}"),
+        )
+        for index, lyric in enumerate(_chunk(iterator, 30))
+    )
+    paginator = yuyo.ComponentPaginator(
+        fields, authors=(ctx.author.id,), timeout=timedelta(seconds=180)
+    )
+    if first_response := await paginator.get_next_entry():
+        content, embed = first_response
+        message = await ctx.respond(
+            content=content, component=paginator, embed=embed, ensure_result=True
+        )
+        ctx.shards.component_client.add_executor(message, paginator)
+        return
+
+
+@component.with_slash_command
+@tanjun.with_int_slash_option("new_index", "New Index the song is moved to")
+@tanjun.with_int_slash_option("old_index", "Song to move")
+@tanjun.as_slash_command("movesong", "Move a song to a specific index")
+async def movesong(ctx: tanjun.abc.Context, old_index: int, new_index: int) -> None:
+    node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    if not len(node.queue) > 1:
+        return ctx.respond("Only one song in the queue!")
+    queue = node.queue
+    song_to_be_moved = queue[old_index]
+    queue.pop(old_index)
+    queue.insert(new_index, song_to_be_moved)
+
+    node.queue = queue
+    await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
+    embed = hikari.Embed(title=f"Moved `{old_index}` to `{new_index}`", color=0x00FF00)
     await ctx.respond(embed=embed)
 
 
