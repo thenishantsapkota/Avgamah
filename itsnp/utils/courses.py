@@ -1,9 +1,14 @@
 import asyncio
 
 import aiohttp
+import tanjun
 from bs4 import BeautifulSoup
 
 baseurl = "https://www.discudemy.com/search/"
+
+
+class CoursesNotFound(tanjun.CommandError):
+    pass
 
 
 async def req(url):
@@ -15,13 +20,16 @@ async def req(url):
 
 class Courses:
     async def get_course(self, topic):
-        content = await req((baseurl + topic))
-        html_content = BeautifulSoup(content, "html.parser")
-        content_in_div = html_content.find("div", "content")
-        link_to_course = (content_in_div.find("a", "card-header"))["href"]
-        course_title = (content_in_div.find("a", "card-header")).text
-        course_description = (content_in_div.find("div", "description")).text
-        image_link = (content_in_div.find("amp-img"))["src"]
+        try:
+            content = await req((baseurl + topic))
+            html_content = BeautifulSoup(content, "html.parser")
+            content_in_div = html_content.find("div", "content")
+            link_to_course = (content_in_div.find("a", "card-header"))["href"]
+            course_title = (content_in_div.find("a", "card-header")).text
+            course_description = (content_in_div.find("div", "description")).text
+            image_link = (content_in_div.find("amp-img"))["src"]
+        except AttributeError:
+            raise CoursesNotFound("No Courses found with that topic.")
 
         p1 = await req(link_to_course)
         p1_html = (BeautifulSoup(p1, "html.parser")).find(
