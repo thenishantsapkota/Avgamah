@@ -53,7 +53,7 @@ class Permissions:
     """Custom class for checking guild settings to handle moderation commands."""
 
     async def has_permissions(
-        self, member: hikari.Member, permission: hikari.Permissions
+        self, member: hikari.Member, permission: list[hikari.Permissions]
     ) -> bool:
         roles = member.get_roles()
         perms = hikari.Permissions.NONE
@@ -62,7 +62,7 @@ class Permissions:
             perms |= r.permissions
 
         permissions = str(perms).split("|")
-        if permission in permissions:
+        if set(permission) & set(permissions):
             return True
         return False
 
@@ -91,7 +91,7 @@ class Permissions:
     ) -> None:
         staff_role = (await self.fetch_role_data(guild)).get("staffrole")
         if not (
-            await self.has_permissions(ctx.member, "MANAGE_MESSAGES")
+            await self.has_permissions(ctx.member, ["MANAGE_MESSAGES", "ADMINISTRATOR"])
             or await self.rolecheck(ctx.member, staff_role)
         ):
             raise tanjun.CommandError(
@@ -103,7 +103,7 @@ class Permissions:
     ) -> None:
         mod_role = (await self.fetch_role_data(guild)).get("modrole")
         if not (
-            await self.has_permissions(ctx.member, "MANAGE_ROLES")
+            await self.has_permissions(ctx.member, ["MANAGE_ROLES", "ADMINISTRATOR"])
             or await self.rolecheck(ctx.member, mod_role)
         ):
             raise tanjun.CommandError(
@@ -115,7 +115,7 @@ class Permissions:
     ) -> None:
         admin_role = (await self.fetch_role_data(guild)).get("adminrole")
         if not (
-            await self.has_permissions(ctx.member, "ADMINISTRATOR")
+            await self.has_permissions(ctx.member, ["ADMINISTRATOR"])
             or await self.rolecheck(ctx.member, admin_role)
         ):
             raise tanjun.CommandError(
