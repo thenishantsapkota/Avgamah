@@ -4,20 +4,16 @@ import hikari
 import tanjun
 from hikari import Embed
 
-from itsnp.core.bot import Bot
 from itsnp.core.client import Client
+from itsnp.utils.permissions import Permissions
 from models import ModerationRoles
 
 component = tanjun.Component()
+permissions = Permissions()
 
 role_group = tanjun.SlashCommandGroup(
     "role", "Set moderation roles for the server"
-).add_check(
-    tanjun.AuthorPermissionCheck(
-        hikari.Permissions.ADMINISTRATOR,
-        error_message="You need **Administrator** permission(s) to run this command.",
-    )
-)
+).add_check(tanjun.AuthorPermissionCheck(hikari.Permissions.ADMINISTRATOR))
 
 
 @role_group.with_command
@@ -96,12 +92,46 @@ async def list_command(ctx: tanjun.abc.Context) -> None:
     await ctx.respond(embed=embed)
 
 
-@component.with_slash_command
-@tanjun.with_owner_check
-@tanjun.as_slash_command("shutdown", "Shutdown the bot(Only for owner)!")
-async def shutdown_command(ctx: tanjun.abc.Context):
-    await ctx.respond("Bot is Stopping.....Good Bye!")
-    await Bot.close()
+@role_group.with_command
+@tanjun.with_role_slash_option("role", "Role to give the member")
+@tanjun.with_member_slash_option("member", "Member to whom role is to be given")
+@tanjun.as_slash_command("give", "Give a role to a member")
+async def give_role_command(
+    ctx: tanjun.abc.Context, member: hikari.Member, role: hikari.Role
+) -> None:
+    guild = ctx.get_guild()
+    author = ctx.member
+    await permissions.mod_role_check(ctx, guild)
+    await member.add_role(role)
+    embed = Embed(
+        title=f"Updated Roles for {member}",
+        color=role.color,
+        timestamp=datetime.now().astimezone(),
+    )
+    embed.add_field(name="Added Role", value=f"{role.mention}")
+    embed.set_author(name=f"{author} [ {author.id} ]", icon=author.avatar_url)
+    await ctx.respond(embed=embed)
+
+
+@role_group.with_command
+@tanjun.with_role_slash_option("role", "Role to remove from the member")
+@tanjun.with_member_slash_option("member", "Member from whom role is to be taken")
+@tanjun.as_slash_command("take", "Take a role to a member")
+async def take_role_command(
+    ctx: tanjun.abc.Context, member: hikari.Member, role: hikari.Role
+) -> None:
+    guild = ctx.get_guild()
+    author = ctx.member
+    await permissions.mod_role_check(ctx, guild)
+    await member.remove_role(role)
+    embed = Embed(
+        title=f"Updated Roles for {member}",
+        color=role.color,
+        timestamp=datetime.now().astimezone(),
+    )
+    embed.add_field(name="Removed Role", value=f"{role.mention}")
+    embed.set_author(name=f"{author} [ {author.id} ]", icon=author.avatar_url)
+    await ctx.respond(embed=embed)
 
 
 component.add_slash_command(role_group)
