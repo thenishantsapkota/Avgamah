@@ -1,0 +1,21 @@
+"""Configuration file for  tortoise-orm"""
+tortoise_config = {
+    "connections": {
+        "default": {
+            "engine": "tortoise.backends.asyncpg",
+            "credentials": {
+                "database": "Your DB name here",
+                "host": "Hostname if using external databases else localhost",
+                "password": "database password",
+                "port": Port the database is running on,
+                "user": "Owner of the database",
+            },
+        }
+    },
+    "apps": {
+        "main": {
+            "models": ["models", "aerich.models"],
+            "default_connection": "default",
+        }
+    },
+}
