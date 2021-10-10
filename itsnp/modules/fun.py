@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import aiohttp
+import hikari
 import tanjun
 from hikari import Embed
 
@@ -11,6 +12,11 @@ component = tanjun.Component()
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+)
 @tanjun.as_slash_command("cat", "Return a cat gif.", default_to_ephemeral=True)
 async def cat_command(ctx: tanjun.abc.Context) -> None:
     async with aiohttp.ClientSession() as session:
@@ -31,6 +37,11 @@ async def cat_command(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+)
 @tanjun.as_slash_command("dog", "Return a dog gif.", default_to_ephemeral=True)
 async def dog_command(ctx: tanjun.abc.Context) -> None:
     async with aiohttp.ClientSession() as session:
@@ -51,6 +62,11 @@ async def dog_command(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+)
 @tanjun.with_str_slash_option("term", "Term to Search for")
 @tanjun.as_slash_command(
     "urban", "Search a term on urban dictionary", default_to_ephemeral=True
