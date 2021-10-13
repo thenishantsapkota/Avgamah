@@ -128,11 +128,11 @@ async def now_playing(ctx: tanjun.abc.Context) -> None:
     if not node or not node.now_playing:
         return await ctx.respond("There's nothing playing at the moment!")
 
-    song_length = pretty_timedelta(
+    song_length = pretty_timedelta_shortened(
         timedelta(seconds=float(node.now_playing.track.info.length) / 1000)
     )
 
-    current_position = pretty_timedelta(
+    current_position = pretty_timedelta_shortened(
         timedelta(seconds=float(node.now_playing.track.info.position) / 1000)
     )
 
@@ -150,7 +150,7 @@ async def now_playing(ctx: tanjun.abc.Context) -> None:
         ("Author", node.now_playing.track.info.author, True),
         (
             "Progress",
-            f"{progress_bar}\n**{current_position if current_position else 0}/{song_length}**",
+            f"{progress_bar}\n**{current_position if current_position else '0s'} / {song_length}**",
             False,
         ),
     ]
@@ -190,26 +190,36 @@ async def queue(ctx: tanjun.abc.Context) -> None:
                 f"[{song.track.info.title}]({song.track.info.uri}) [<@{song.requester}>]"
             ]
 
-        fields = (
-            (
-                hikari.UNDEFINED,
-                hikari.Embed(
-                    description=f"\n".join(track),
-                    color=0x00FF00,
-                    title=f"Queue for {ctx.get_guild()}",
-                    timestamp=datetime.now().astimezone(),
-                )
-                .set_footer(text=f"Page {index+1}")
-                .add_field(
-                    name="Now Playing",
-                    value=f"[{node.now_playing.track.info.title}]({node.now_playing.track.info.uri}) [<@{node.now_playing.requester}>]",
-                ),
+        fields = []
+        counter = 1
+        if not len(song_queue[1:]) > 0:
+            return await ctx.respond(
+                f"No tracks in the queue.\n**Now Playing** : [{node.now_playing.track.info.title}]({node.now_playing.track.info.uri})"
             )
-            for index, track in enumerate(_chunk(song_queue, 10))
-        )
+        for index, track in enumerate(_chunk(song_queue[1:], 8)):
+            string = """"""
+            temp = []
+            for i in track:
+                string += f"""**{counter})** {i}\n"""
+
+                counter += 1
+            embed = hikari.Embed(
+                title=f"Queue for {ctx.get_guild()}",
+                color=0x00FF00,
+                timestamp=datetime.now().astimezone(),
+                description=string,
+            )
+            embed.set_footer(text=f"Page {index+1}")
+            embed.add_field(
+                name="Now Playing",
+                value=f"[{node.now_playing.track.info.title}]({node.now_playing.track.info.uri}) [<@{node.now_playing.requester}>]",
+            )
+            temp.append(hikari.UNDEFINED)
+            temp.append(embed)
+            fields.append(temp)
 
         paginator = yuyo.ComponentPaginator(
-            fields, authors=(ctx.author.id,), timeout=timedelta(seconds=60)
+            iter(fields), authors=(ctx.author.id,), timeout=timedelta(seconds=60)
         )
         if first_response := await paginator.get_next_entry():
             content, embed = first_response
@@ -233,7 +243,7 @@ async def resume(ctx: tanjun.abc.Context) -> None:
         embed = Embed(description=f"🎵 Resumed the Playback!", color=0x00FF00)
         await ctx.respond(embed=embed)
     else:
-        await ctx.respond("It's already resumed >:(")
+        await ctx.respond("It's already resumed. 😡")
 
 
 @component.with_slash_command
@@ -350,7 +360,10 @@ async def movesong(ctx: tanjun.abc.Context, old_index: int, new_index: int) -> N
 
     node.queue = queue
     await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
-    embed = hikari.Embed(title=f"Moved `{old_index}` to `{new_index}`", color=0x00FF00)
+    embed = hikari.Embed(
+        title=f"Moved `{song_to_be_moved.track.info.title}` to Position `{new_index}`",
+        color=0x00FF00,
+    )
     await ctx.respond(embed=embed)
 
 
