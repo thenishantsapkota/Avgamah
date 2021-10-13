@@ -23,6 +23,36 @@ steps = dict(
     millisecond=timedelta(milliseconds=1),
 )
 
+steps_shortened = dict(
+    y=timedelta(days=365),
+    w=timedelta(days=7),
+    d=timedelta(days=1),
+    h=timedelta(hours=1),
+    m=timedelta(minutes=1),
+    s=timedelta(seconds=1),
+    ms=timedelta(milliseconds=1),
+)
+
+
+def pretty_timedelta_shortened(td: timedelta) -> str:
+    """Returns a pretty shortened string of a timedelta"""
+
+    if not isinstance(td, timedelta):
+        raise ValueError(f"timedelta expected, '{type(td)}' given.")
+
+    parts = []
+    for name, span in steps_shortened.items():
+        if td >= span:
+            count = int(td / span)
+            td -= count * span
+            parts.append("{}{}".format(count, name))
+            if len(parts) >= 2 or name == "s":
+                break
+        elif len(parts):
+            break
+
+    return " : ".join(parts)
+
 
 def pretty_timedelta(td: timedelta) -> str:
     """Returns a pretty string of a timedelta"""
@@ -45,6 +75,10 @@ def pretty_timedelta(td: timedelta) -> str:
     return ", ".join(parts)
 
 
+def pretty_seconds_shortened(s) -> str:
+    return pretty_timedelta_shortened(timedelta(seconds=s))
+
+
 def pretty_seconds(s) -> str:
     return pretty_timedelta(timedelta(seconds=s))
 
@@ -59,7 +93,7 @@ def pretty_datetime(dt: datetime, ignore_time=False) -> str:
     )
 
 
-class TimeMultConverter(tanjun.BaseConverter):
+class TimeMultConverter(tanjun.conversion.BaseConverter):
     async def convert(self, ctx, mult) -> float:
         try:
             mult = float(mult)
@@ -72,7 +106,7 @@ class TimeMultConverter(tanjun.BaseConverter):
         return mult
 
 
-class TimeDeltaConverter(tanjun.BaseConverter):
+class TimeDeltaConverter(tanjun.conversion.BaseConverter):
     async def convert(self, ctx, unit):
         unit = unit.lower()
 
@@ -90,7 +124,7 @@ class TimeDeltaConverter(tanjun.BaseConverter):
             raise tanjun.CommandError("Unknown time type.")
 
 
-class TimeConverter(tanjun.BaseConverter):
+class TimeConverter(tanjun.conversion.BaseConverter):
     async def convert(self, ctx: tanjun.abc.Context, argument: str) -> float:
         """Function that converts given time into seconds.
         Parameters
