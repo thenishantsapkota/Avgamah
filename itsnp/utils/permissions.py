@@ -75,7 +75,8 @@ class Permissions:
         model = await ModerationRoles.get_or_none(guild_id=guild.id)
         if model is None:
             raise SetModerationRoles(
-                """Please setup moderation roles before using any moderation commands.
+                """
+            Please setup moderation roles before using any moderation commands.
             Use `/role admin <roleid>`, `/role mod <roleid>`, `/role staff <roleid>` to set moderation roles.
             """
             )
@@ -89,6 +90,16 @@ class Permissions:
     async def staff_role_check(
         self, ctx: tanjun.abc.Context, guild: hikari.Guild
     ) -> None:
+        """
+        Function that checks if the user has "Staff Role" or the "Manage Messages" permission.
+
+        Args:
+            ctx (tanjun.abc.Context): Context of the slash command invokation
+            guild (hikari.Guild): Guild Where the check is to be done
+
+        Raises:
+            tanjun.CommandError: Raised when user doesn't have proper permissions.
+        """
         staff_role = (await self.fetch_role_data(guild)).get("staffrole")
         if not (
             await self.has_permissions(ctx.member, ["MANAGE_MESSAGES", "ADMINISTRATOR"])
@@ -101,6 +112,16 @@ class Permissions:
     async def mod_role_check(
         self, ctx: tanjun.abc.Context, guild: hikari.Guild
     ) -> None:
+        """
+        Function that checks if the user has "Mod Role" or the "Kick Members" permission.
+
+        Args:
+            ctx (tanjun.abc.Context): Context of the Command Invokation
+            guild (hikari.Guild): Guild where the check is to be done
+
+        Raises:
+            tanjun.CommandError: Raised when user doesn't have proper permissions.
+        """
         mod_role = (await self.fetch_role_data(guild)).get("modrole")
         if not (
             await self.has_permissions(ctx.member, ["MANAGE_ROLES", "ADMINISTRATOR"])
@@ -125,6 +146,16 @@ class Permissions:
     async def log_channel_check(
         self, ctx: tanjun.abc.Context, guild: hikari.Guild
     ) -> hikari.GuildTextChannel:
+        """
+        Function that checks if "mod-logs" channel exists in a guild, if not it creates one.
+
+        Args:
+            ctx (tanjun.abc.Context): Context of the command invokation
+            guild (hikari.Guild): Guild where the channel is to be checked
+
+        Returns:
+            hikari.GuildTextChannel: Text Channel of the log channel
+        """
         log_channel = get(await ctx.rest.fetch_guild_channels(guild), name="mod-logs")
         if log_channel is None:
             log_channel = await guild.create_text_channel(name="mod-logs")
@@ -134,55 +165,18 @@ class Permissions:
             )
         return log_channel
 
-    async def member_logging_check(
-        self, guild: hikari.Guild
-    ) -> hikari.GuildTextChannel:
-        log_channel = get(guild.get_channels(), name="member-logs")
-        if log_channel is None:
-            log_channel = await guild.create_text_channel(name="member-logs")
-            await log_channel.edit_overwrite(
-                target=guild.get_role(guild.id),
-                deny=hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.SEND_MESSAGES,
-            )
-        return log_channel
-
-    async def server_logging_check(
-        self, guild: hikari.Guild
-    ) -> hikari.GuildTextChannel:
-        log_channel = get(guild.get_channels(), name="server-logs")
-        if log_channel is None:
-            log_channel = await guild.create_text_channel(name="server-logs")
-            await log_channel.edit_overwrite(
-                target=guild.get_role(guild.id),
-                deny=hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.SEND_MESSAGES,
-            )
-        return log_channel
-
-    async def voice_logging_check(self, guild: hikari.Guild) -> hikari.GuildTextChannel:
-        log_channel = get(guild.get_channels(), name="voice-logs")
-        if log_channel is None:
-            log_channel = await guild.create_text_channel(name="voice-logs")
-            await log_channel.edit_overwrite(
-                target=guild.get_role(guild.id),
-                deny=hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.SEND_MESSAGES,
-            )
-        return log_channel
-
-    async def message_logging_check(
-        self, guild: hikari.Guild
-    ) -> hikari.GuildTextChannel:
-        log_channel = get(guild.get_channels(), name="message-logs")
-        if log_channel is None:
-            log_channel = await guild.create_text_channel(name="message-logs")
-            await log_channel.edit_overwrite(
-                target=guild.get_role(guild.id),
-                deny=hikari.Permissions.VIEW_CHANNEL | hikari.Permissions.SEND_MESSAGES,
-            )
-        return log_channel
-
     async def muted_role_check(
         self, ctx: tanjun.abc.Context, guild: hikari.Guild
     ) -> hikari.Role:
+        """Function that checks for "Muted" role in the guild
+
+        Args:
+            ctx (tanjun.abc.Context): Context of the Slash Command Invokation
+            guild (hikari.Guild): Guild where the muted role is to checked for existance
+
+        Returns:
+            hikari.Role: Muted Role of the server
+        """
         muted_role = get(await ctx.rest.fetch_roles(guild), name="Muted")
         if muted_role is None:
             muted_role = await ctx.rest.create_role(guild, name="Muted")
@@ -196,6 +190,15 @@ class Permissions:
     async def check_higher_role(
         self, author: hikari.Member, member: hikari.Member
     ) -> None:
+        """Function that checks if the command author has higher role than the member
+
+        Args:
+            author (hikari.Member): Author of the Command Invokation
+            member (hikari.Member): Member against whom author's permissions are to be checked
+
+        Raises:
+            tanjun.CommandError: Error raised when Author role is not higher than Member's top role
+        """
         author_top_role = author.get_top_role()
         member_top_role = member.get_top_role()
 
@@ -207,6 +210,14 @@ class Permissions:
     async def check_booster_role(
         self, member: hikari.Member
     ) -> Union[hikari.Role, None]:
+        """Function that checks for booster role in the guild
+
+        Args:
+            member (hikari.Member): Member on whom the role is to be checked
+
+        Returns:
+            Union[hikari.Role, None]: Gets the booster role if exists on the member else returns None
+        """
         for role in member.get_roles():
             if role.is_premium_subscriber_role:
                 booster_role = role
