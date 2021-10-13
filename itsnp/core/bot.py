@@ -40,7 +40,9 @@ class Bot(hikari.GatewayBot):
 
     def create_client(self: _ITSNP) -> None:
         """Function that creates the tanjun client"""
-        self.client = Client.from_gateway_bot(self, set_global_commands=True)
+        self.client = Client.from_gateway_bot(
+            self, declare_global_commands=TEST_GUILD_ID
+        )
         self.client.load_modules()
 
     def run(self: _ITSNP) -> None:
