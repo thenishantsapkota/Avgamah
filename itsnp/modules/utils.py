@@ -14,6 +14,13 @@ emoji_group = tanjun.slash_command_group("emoji", "Group that handles emoji oper
 
 
 @emoji_group.with_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.MANAGE_EMOJIS_AND_STICKERS
+)
 @tanjun.with_str_slash_option("name", "Name of the emoji")
 @tanjun.with_str_slash_option("url", "URL of the Emoji to be created.")
 @tanjun.as_slash_command("create", "Create an emoji in the guild")
@@ -37,6 +44,13 @@ async def create_emoji(ctx: tanjun.abc.Context, url: str, name: str) -> None:
 
 
 @emoji_group.with_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.MANAGE_EMOJIS_AND_STICKERS
+)
 @tanjun.with_str_slash_option("new_name", "New Name of the Emoji")
 @tanjun.with_str_slash_option("emoji_id", "ID of the Emoji to be renamed")
 @tanjun.as_slash_command("rename", "Rename an emoji of the server")
@@ -51,6 +65,13 @@ async def rename_emoji(ctx: tanjun.abc.Context, emoji_id: str, new_name: str) ->
 
 
 @emoji_group.with_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.MANAGE_EMOJIS_AND_STICKERS
+)
 @tanjun.with_str_slash_option("emoji_id", "ID of the Emoji to be deleted")
 @tanjun.as_slash_command("delete", "Delete an emoji from the server")
 async def delete_emoji(ctx: tanjun.abc.Context, emoji_id: str) -> None:

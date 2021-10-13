@@ -1,6 +1,7 @@
 import warnings
 
 import aiohttp
+import hikari
 import tanjun
 from hikari import Embed
 
@@ -91,6 +92,12 @@ async def build(target) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.with_str_slash_option("term", "Term to search for")
 @tanjun.with_str_slash_option(
     "doc", "Documentation of Library", choices=(l.lower() for l in TARGETS.keys())
@@ -140,6 +147,12 @@ async def rtfm_command(ctx: tanjun.abc.Context, doc: str, *, term: str) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command(
     "rtfmlist", "List all the avaliable documentation search targets"
 )

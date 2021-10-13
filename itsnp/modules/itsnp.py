@@ -13,6 +13,11 @@ course_obj = Courses()
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+)
 @tanjun.with_str_slash_option("course_topic", "Topic the course is about")
 @tanjun.as_slash_command("freecourses", "Get a link of free courses.")
 async def freecourses_command(ctx: tanjun.abc.Context, *, course_topic: str) -> None:

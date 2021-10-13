@@ -22,6 +22,12 @@ role_group = tanjun.SlashCommandGroup(
 
 
 @role_group.with_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.MANAGE_ROLES
+    | hikari.Permissions.MANAGE_GUILD
+)
 @tanjun.with_role_slash_option("role", "Role or role id of admin role")
 @tanjun.as_slash_command("admin", "Set admin role for the server.")
 async def admin_role_command(ctx: tanjun.abc.Context, role: hikari.Role) -> None:
@@ -39,6 +45,12 @@ async def admin_role_command(ctx: tanjun.abc.Context, role: hikari.Role) -> None
 
 
 @role_group.with_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.MANAGE_ROLES
+    | hikari.Permissions.MANAGE_GUILD
+)
 @tanjun.with_role_slash_option("role", "Role or role id of mod role")
 @tanjun.as_slash_command("mod", "Set mod role for the server.")
 async def mod_role_command(ctx: tanjun.abc.Context, role: hikari.Role) -> None:
@@ -56,6 +68,12 @@ async def mod_role_command(ctx: tanjun.abc.Context, role: hikari.Role) -> None:
 
 
 @role_group.with_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.MANAGE_ROLES
+    | hikari.Permissions.MANAGE_GUILD
+)
 @tanjun.with_role_slash_option("role", "Role or role id of staff role")
 @tanjun.as_slash_command("staff", "Set staff role for the server.")
 async def staff_role_command(ctx: tanjun.abc.Context, role: hikari.Role) -> None:
@@ -73,6 +91,12 @@ async def staff_role_command(ctx: tanjun.abc.Context, role: hikari.Role) -> None
 
 
 @role_group.with_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.MANAGE_ROLES
+    | hikari.Permissions.MANAGE_GUILD
+)
 @tanjun.as_slash_command("list", "List moderation roles for the server")
 async def list_command(ctx: tanjun.abc.Context) -> None:
     guild = ctx.get_guild()
@@ -98,6 +122,12 @@ async def list_command(ctx: tanjun.abc.Context) -> None:
 
 
 @role_group.with_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.MANAGE_ROLES
+    | hikari.Permissions.MANAGE_GUILD
+)
 @tanjun.with_role_slash_option("role", "Role to give the member")
 @tanjun.with_member_slash_option("member", "Member to whom role is to be given")
 @tanjun.as_slash_command("give", "Give a role to a member")
@@ -119,6 +149,12 @@ async def give_role_command(
 
 
 @role_group.with_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.MANAGE_ROLES
+    | hikari.Permissions.MANAGE_GUILD
+)
 @tanjun.with_role_slash_option("role", "Role to remove from the member")
 @tanjun.with_member_slash_option("member", "Member from whom role is to be taken")
 @tanjun.as_slash_command("take", "Take a role to a member")

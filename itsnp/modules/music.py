@@ -41,6 +41,12 @@ async def _join(ctx: tanjun.abc.Context) -> int:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("join", "Join a voice channel of a guild")
 async def join(ctx: tanjun.abc.Context) -> None:
     channel_id = await _join(ctx)
@@ -51,6 +57,12 @@ async def join(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("leave", "Leave the voice channel")
 async def leave(ctx: tanjun.abc.Context) -> None:
     await ctx.shards.data.lavalink.destroy(ctx.guild_id)
@@ -67,6 +79,12 @@ async def leave(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("stop", "Stop the playback")
 async def stop(ctx: tanjun.abc.Context) -> None:
     await ctx.shards.data.lavalink.stop(ctx.guild_id)
@@ -79,6 +97,12 @@ async def stop(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.with_str_slash_option("query", "Name of the song or URL")
 @tanjun.as_slash_command("play", "Play a song")
 async def play(ctx: tanjun.abc.Context, query: str) -> None:
@@ -121,6 +145,12 @@ async def play(ctx: tanjun.abc.Context, query: str) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("nowplaying", "See Currently Playing Song")
 async def now_playing(ctx: tanjun.abc.Context) -> None:
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
@@ -160,6 +190,12 @@ async def now_playing(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("pause", "Pause the current song being played")
 async def pause(ctx: tanjun.abc.Context) -> None:
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
@@ -177,6 +213,12 @@ async def pause(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("queue", "Shows the music queue")
 async def queue(ctx: tanjun.abc.Context) -> None:
     song_queue = []
@@ -231,6 +273,12 @@ async def queue(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("resume", "Resume the song that is paused")
 async def resume(ctx: tanjun.abc.Context) -> None:
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
@@ -247,6 +295,12 @@ async def resume(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.with_int_slash_option("volume", "Volume to be set (Between 0 and 100)")
 @tanjun.as_slash_command("volume", "Increase/Decrease the volume")
 async def volume(ctx: tanjun.abc.Context, volume: int) -> None:
@@ -264,6 +318,12 @@ async def volume(ctx: tanjun.abc.Context, volume: int) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("skip", "Skips the current song")
 async def skip(ctx: tanjun.abc.Context) -> None:
 
@@ -285,6 +345,12 @@ async def skip(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("shuffle", "Shuffle the current queue")
 async def shuffle(ctx: tanjun.abc.Context) -> None:
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
@@ -304,6 +370,12 @@ async def shuffle(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("lyrics", "Get lyrics of Currently playing song")
 async def lyrics(ctx: tanjun.abc.Context) -> None:
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
@@ -346,6 +418,12 @@ async def lyrics(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.with_int_slash_option("new_index", "New Index the song is moved to")
 @tanjun.with_int_slash_option("old_index", "Song to move")
 @tanjun.as_slash_command("movesong", "Move a song to a specific index")

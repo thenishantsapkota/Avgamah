@@ -40,6 +40,12 @@ PLATFORM = list(LINKS_DICT.keys())
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("hello", "Greet the user with hello.")
 async def hello_command(ctx: tanjun.abc.Context) -> None:
     greeting = random.choice(("Hello", "Hi", "Hey"))
@@ -47,6 +53,12 @@ async def hello_command(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("ping", "Return bot ping.")
 async def ping_command(ctx: tanjun.abc.Context) -> None:
     heartbeat_latency = (
@@ -62,6 +74,12 @@ async def ping_command(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.with_str_slash_option(
     "platform", "The link to show", choices=(l.lower() for l in PLATFORM)
 )
@@ -77,6 +95,12 @@ async def link_command(ctx: tanjun.abc.Context, platform: str) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.with_member_slash_option("member", "Get member.")
 @tanjun.as_slash_command("avatar", "View a member's avatar", default_to_ephemeral=True)
 async def avatar_command(
@@ -92,6 +116,12 @@ async def avatar_command(
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("links", "Get all ITSNP Links")
 async def links_command(ctx: tanjun.abc.Context) -> None:
     rows = []
@@ -155,6 +185,12 @@ async def serverinfo_command(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.with_member_slash_option("member", "Choose a member", default=False)
 @tanjun.as_slash_command(
     "userinfo", "Get info of a user in a guild", default_to_ephemeral=True
@@ -207,6 +243,12 @@ async def userinfo_command(ctx: tanjun.abc.Context, member: hikari.Member) -> No
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("botinfo", "View Bot's info")
 async def botinfo_command(ctx: tanjun.abc.Context) -> None:
     proc = Process()
@@ -245,6 +287,12 @@ async def botinfo_command(ctx: tanjun.abc.Context) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.with_str_slash_option("city", "A city's name")
 @tanjun.as_slash_command("weather", "Get a place's weather.")
 async def weather_command(ctx: tanjun.abc.Context, *, city: str) -> None:
@@ -293,6 +341,12 @@ async def weather_command(ctx: tanjun.abc.Context, *, city: str) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.with_str_slash_option("ip", "IP Address you want to lookup")
 @tanjun.as_slash_command(
     "ipinfo", "Get info about an IP Address", default_to_ephemeral=True
@@ -332,6 +386,12 @@ async def ipinfo_command(ctx: tanjun.abc.Context, ip: str) -> None:
 
 
 @component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.as_slash_command("botinvite", "Invite Link for the bot")
 async def botinvite_command(ctx: tanjun.abc.Context) -> None:
     """Sends a invite link for the bot"""

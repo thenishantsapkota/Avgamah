@@ -27,9 +27,11 @@ async def add_suggestion_command(ctx: tanjun.abc.Context, *, suggestion: str) ->
 
 
 @component.with_slash_command
-@tanjun.with_own_permission_check(hikari.Permissions.MANAGE_MESSAGES)
-@tanjun.with_own_permission_check(hikari.Permissions.MANAGE_MESSAGES)
-@tanjun.with_author_permission_check(hikari.Permissions.MANAGE_GUILD)
+@tanjun.with_own_permission_check(
+    hikari.Permissions.MANAGE_MESSAGES
+    | hikari.Permissions.MANAGE_MESSAGES
+    | hikari.Permissions.MANAGE_GUILD
+)
 @tanjun.with_str_slash_option("message_id", "Message ID of the suggestion")
 @tanjun.as_slash_command("approve", "Approve the suggestion", default_to_ephemeral=True)
 async def approve_command(ctx: tanjun.abc.Context, message_id: str) -> None:
