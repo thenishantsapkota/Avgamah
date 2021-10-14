@@ -28,7 +28,9 @@ async def check_voice_state(ctx: tanjun.abc.Context):
     voice_state_author = ctx.cache.get_voice_state(guild, ctx.author)
 
     if voice_state_bot is None:
-        raise tanjun.CommandError("I am not connected to any Voice Channel.")
+        raise tanjun.CommandError(
+            "I am not connected to any Voice Channel.\nUse `/join` to connect me to one."
+        )
 
     if voice_state_author is None:
         raise tanjun.CommandError(
@@ -42,6 +44,8 @@ async def check_voice_state(ctx: tanjun.abc.Context):
 
 
 async def _join(ctx: tanjun.abc.Context) -> int:
+    if ctx.cache.get_voice_state(ctx.get_guild(), await ctx.rest.fetch_my_user()):
+        raise tanjun.CommandError("I am already connected to another Voice Channel.")
     states = ctx.shards.cache.get_voice_states_view_for_guild(ctx.get_guild())
     voice_state = list(filter(lambda i: i.user_id == ctx.author.id, states.iterator()))
 
