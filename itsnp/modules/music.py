@@ -9,9 +9,8 @@ import tanjun
 import yuyo
 from hikari import Embed
 from StringProgressBar import progressBar
-from tanjun.clients import as_loader
 
-from itsnp.core import Bot, Client
+from itsnp.core import Client
 from itsnp.utils.time import *
 from itsnp.utils.utilities import _chunk
 
@@ -19,6 +18,27 @@ component = tanjun.Component()
 
 
 URL_REGEX = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+
+
+async def check_voice_state(ctx: tanjun.abc.Context):
+    guild = ctx.get_guild()
+    bot_user = await ctx.rest.fetch_my_user()
+
+    voice_state_bot = ctx.cache.get_voice_state(guild, bot_user)
+    voice_state_author = ctx.cache.get_voice_state(guild, ctx.author)
+
+    if voice_state_bot is None:
+        raise tanjun.CommandError("I am not connected to any Voice Channel.")
+
+    if voice_state_author is None:
+        raise tanjun.CommandError(
+            "You are not in a Voice Channel, Join a Voice Channel to continue."
+        )
+
+    if not voice_state_author.channel_id == voice_state_bot.channel_id:
+        raise tanjun.CommandError(
+            "I cannot run this command as you are not in the same voice channel as the bot."
+        )
 
 
 async def _join(ctx: tanjun.abc.Context) -> int:
@@ -44,8 +64,9 @@ async def _join(ctx: tanjun.abc.Context) -> int:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("join", "Join a voice channel of a guild")
 async def join(ctx: tanjun.abc.Context) -> None:
@@ -60,11 +81,14 @@ async def join(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("leave", "Leave the voice channel")
 async def leave(ctx: tanjun.abc.Context) -> None:
+    await check_voice_state(ctx)
+
     await ctx.shards.data.lavalink.destroy(ctx.guild_id)
     await ctx.shards.data.lavalink.stop(ctx.guild_id)
     await ctx.shards.data.lavalink.leave(ctx.guild_id)
@@ -82,11 +106,13 @@ async def leave(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("stop", "Stop the playback")
 async def stop(ctx: tanjun.abc.Context) -> None:
+    await check_voice_state(ctx)
     await ctx.shards.data.lavalink.stop(ctx.guild_id)
 
     embed = Embed(
@@ -100,8 +126,9 @@ async def stop(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.with_str_slash_option("query", "Name of the song or URL")
 @tanjun.as_slash_command("play", "Play a song")
@@ -148,8 +175,9 @@ async def play(ctx: tanjun.abc.Context, query: str) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("nowplaying", "See Currently Playing Song")
 async def now_playing(ctx: tanjun.abc.Context) -> None:
@@ -193,11 +221,13 @@ async def now_playing(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("pause", "Pause the current song being played")
 async def pause(ctx: tanjun.abc.Context) -> None:
+    await check_voice_state(ctx)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
 
     if not node or not node.now_playing:
@@ -216,15 +246,16 @@ async def pause(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("queue", "Shows the music queue")
 async def queue(ctx: tanjun.abc.Context) -> None:
     song_queue = []
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
 
-    if not node:
+    if not node or not node.queue:
         return await ctx.respond("There are no tracks in the queue!")
     else:
         for song in node.queue:
@@ -276,11 +307,13 @@ async def queue(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("resume", "Resume the song that is paused")
 async def resume(ctx: tanjun.abc.Context) -> None:
+    await check_voice_state(ctx)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
 
     if not node or not node.now_playing:
@@ -298,12 +331,14 @@ async def resume(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.with_int_slash_option("volume", "Volume to be set (Between 0 and 100)")
 @tanjun.as_slash_command("volume", "Increase/Decrease the volume")
 async def volume(ctx: tanjun.abc.Context, volume: int) -> None:
+    await check_voice_state(ctx)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
 
     if not node or not node.now_playing:
@@ -321,11 +356,13 @@ async def volume(ctx: tanjun.abc.Context, volume: int) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("skip", "Skips the current song")
 async def skip(ctx: tanjun.abc.Context) -> None:
+    await check_voice_state(ctx)
 
     skip = await ctx.shards.data.lavalink.skip(ctx.guild_id)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
@@ -348,11 +385,13 @@ async def skip(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("shuffle", "Shuffle the current queue")
 async def shuffle(ctx: tanjun.abc.Context) -> None:
+    await check_voice_state(ctx)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
     if not len(node.queue) > 1:
         return ctx.respond("Only one song in the queue!")
@@ -373,8 +412,9 @@ async def shuffle(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("lyrics", "Get lyrics of Currently playing song")
 async def lyrics(ctx: tanjun.abc.Context) -> None:
@@ -421,15 +461,17 @@ async def lyrics(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
 )
 @tanjun.with_int_slash_option("new_index", "New Index the song is moved to")
 @tanjun.with_int_slash_option("old_index", "Song to move")
 @tanjun.as_slash_command("movesong", "Move a song to a specific index")
 async def movesong(ctx: tanjun.abc.Context, old_index: int, new_index: int) -> None:
+    await check_voice_state(ctx)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
-    if not len(node.queue) > 1:
+    if not len(node.queue) >= 1:
         return ctx.respond("Only one song in the queue!")
     queue = node.queue
     song_to_be_moved = queue[old_index]
@@ -441,6 +483,33 @@ async def movesong(ctx: tanjun.abc.Context, old_index: int, new_index: int) -> N
     embed = hikari.Embed(
         title=f"Moved `{song_to_be_moved.track.info.title}` to Position `{new_index}`",
         color=0x00FF00,
+    )
+    await ctx.respond(embed=embed)
+
+
+@component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.CONNECT
+    | hikari.Permissions.SPEAK
+)
+@tanjun.with_int_slash_option("index", "Index of the Song to be removed")
+@tanjun.as_slash_command("removesong", "Remove a song at a specific index")
+async def removesong(ctx: tanjun.abc.Context, index: int) -> None:
+    await check_voice_state(ctx)
+    node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    if not node.queue:
+        return await ctx.respond("No songs in the queue.")
+    queue = node.queue
+    song_to_be_removed = queue[index]
+    queue.pop(index)
+
+    node.queue = queue
+    await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
+    embed = hikari.Embed(
+        title=f"Removed `{song_to_be_removed.track.info.title}` from the queue."
     )
     await ctx.respond(embed=embed)
 
