@@ -17,30 +17,37 @@ from itsnp.utils.utilities import _chunk
 component = tanjun.Component()
 
 
-URL_REGEX = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+URL_REGEX = re.compile(
+    r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+)
 
 
-async def check_voice_state(ctx: tanjun.abc.Context):
-    guild = ctx.get_guild()
-    bot_user = await ctx.rest.fetch_my_user()
+def check_voice_state(f):
+    async def predicate(ctx: tanjun.abc.Context, *args, **kwargs):
+        guild = ctx.get_guild()
+        bot_user = await ctx.rest.fetch_my_user()
 
-    voice_state_bot = ctx.cache.get_voice_state(guild, bot_user)
-    voice_state_author = ctx.cache.get_voice_state(guild, ctx.author)
+        voice_state_bot = ctx.cache.get_voice_state(guild, bot_user)
+        voice_state_author = ctx.cache.get_voice_state(guild, ctx.author)
 
-    if voice_state_bot is None:
-        raise tanjun.CommandError(
-            "I am not connected to any Voice Channel.\nUse `/join` to connect me to one."
-        )
+        if voice_state_bot is None:
+            raise tanjun.CommandError(
+                "I am not connected to any Voice Channel.\nUse `/join` to connect me to one."
+            )
 
-    if voice_state_author is None:
-        raise tanjun.CommandError(
-            "You are not in a Voice Channel, Join a Voice Channel to continue."
-        )
+        if voice_state_author is None:
+            raise tanjun.CommandError(
+                "You are not in a Voice Channel, Join a Voice Channel to continue."
+            )
 
-    if not voice_state_author.channel_id == voice_state_bot.channel_id:
-        raise tanjun.CommandError(
-            "I cannot run this command as you are not in the same voice channel as the bot."
-        )
+        if not voice_state_author.channel_id == voice_state_bot.channel_id:
+            raise tanjun.CommandError(
+                "I cannot run this command as you are not in the same voice channel as the me."
+            )
+
+        return await f(ctx, *args, **kwargs)
+
+    return predicate
 
 
 async def _join(ctx: tanjun.abc.Context) -> int:
@@ -90,9 +97,8 @@ async def join(ctx: tanjun.abc.Context) -> None:
     | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("leave", "Leave the voice channel")
+@check_voice_state
 async def leave(ctx: tanjun.abc.Context) -> None:
-    await check_voice_state(ctx)
-
     await ctx.shards.data.lavalink.destroy(ctx.guild_id)
     await ctx.shards.data.lavalink.stop(ctx.guild_id)
     await ctx.shards.data.lavalink.leave(ctx.guild_id)
@@ -115,8 +121,8 @@ async def leave(ctx: tanjun.abc.Context) -> None:
     | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("stop", "Stop the playback")
+@check_voice_state
 async def stop(ctx: tanjun.abc.Context) -> None:
-    await check_voice_state(ctx)
     await ctx.shards.data.lavalink.stop(ctx.guild_id)
 
     embed = Embed(
@@ -148,12 +154,12 @@ async def play(ctx: tanjun.abc.Context, query: str) -> None:
         return await ctx.respond("I could not find any songs according to the query!")
 
     try:
-        if not re.match(URL_REGEX, query):
+        if not URL_REGEX.match(query):
             await ctx.shards.data.lavalink.play(
                 ctx.guild_id, query_information.tracks[0]
             ).requester(ctx.author.id).queue()
             node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
-        if re.match(URL_REGEX, query):
+        else:
             for track in query_information.tracks:
                 await ctx.shards.data.lavalink.play(ctx.guild_id, track).requester(
                     ctx.author.id
@@ -230,8 +236,8 @@ async def now_playing(ctx: tanjun.abc.Context) -> None:
     | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("pause", "Pause the current song being played")
+@check_voice_state
 async def pause(ctx: tanjun.abc.Context) -> None:
-    await check_voice_state(ctx)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
 
     if not node or not node.now_playing:
@@ -261,50 +267,50 @@ async def queue(ctx: tanjun.abc.Context) -> None:
 
     if not node or not node.queue:
         return await ctx.respond("There are no tracks in the queue!")
-    else:
-        for song in node.queue:
-            song_queue += [
-                f"[{song.track.info.title}]({song.track.info.uri}) [<@{song.requester}>]"
-            ]
 
-        fields = []
-        counter = 1
-        if not len(song_queue[1:]) > 0:
-            return await ctx.respond(
-                f"No tracks in the queue.\n**Now Playing** : [{node.now_playing.track.info.title}]({node.now_playing.track.info.uri})"
-            )
-        for index, track in enumerate(_chunk(song_queue[1:], 8)):
-            string = """"""
-            temp = []
-            for i in track:
-                string += f"""**{counter})** {i}\n"""
+    for song in node.queue:
+        song_queue += [
+            f"[{song.track.info.title}]({song.track.info.uri}) [<@{song.requester}>]"
+        ]
 
-                counter += 1
-            embed = hikari.Embed(
-                title=f"Queue for {ctx.get_guild()}",
-                color=0x00FF00,
-                timestamp=datetime.now().astimezone(),
-                description=string,
-            )
-            embed.set_footer(text=f"Page {index+1}")
-            embed.add_field(
-                name="Now Playing",
-                value=f"[{node.now_playing.track.info.title}]({node.now_playing.track.info.uri}) [<@{node.now_playing.requester}>]",
-            )
-            temp.append(hikari.UNDEFINED)
-            temp.append(embed)
-            fields.append(temp)
-
-        paginator = yuyo.ComponentPaginator(
-            iter(fields), authors=(ctx.author.id,), timeout=timedelta(seconds=60)
+    fields = []
+    counter = 1
+    if not len(song_queue[1:]) > 0:
+        return await ctx.respond(
+            f"No tracks in the queue.\n**Now Playing** : [{node.now_playing.track.info.title}]({node.now_playing.track.info.uri})"
         )
-        if first_response := await paginator.get_next_entry():
-            content, embed = first_response
-            message = await ctx.respond(
-                content=content, component=paginator, embed=embed, ensure_result=True
-            )
-            ctx.shards.component_client.add_executor(message, paginator)
-            return
+    for index, track in enumerate(_chunk(song_queue[1:], 8)):
+        string = """"""
+        temp = []
+        for i in track:
+            string += f"""**{counter})** {i}\n"""
+
+            counter += 1
+        embed = hikari.Embed(
+            title=f"Queue for {ctx.get_guild()}",
+            color=0x00FF00,
+            timestamp=datetime.now().astimezone(),
+            description=string,
+        )
+        embed.set_footer(text=f"Page {index+1}")
+        embed.add_field(
+            name="Now Playing",
+            value=f"[{node.now_playing.track.info.title}]({node.now_playing.track.info.uri}) [<@{node.now_playing.requester}>]",
+        )
+        temp.append(hikari.UNDEFINED)
+        temp.append(embed)
+        fields.append(temp)
+
+    paginator = yuyo.ComponentPaginator(
+        iter(fields), authors=(ctx.author.id,), timeout=timedelta(seconds=60)
+    )
+    if first_response := await paginator.get_next_entry():
+        content, embed = first_response
+        message = await ctx.respond(
+            content=content, component=paginator, embed=embed, ensure_result=True
+        )
+        ctx.shards.component_client.add_executor(message, paginator)
+        return
 
 
 @component.with_slash_command
@@ -316,8 +322,8 @@ async def queue(ctx: tanjun.abc.Context) -> None:
     | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("resume", "Resume the song that is paused")
+@check_voice_state
 async def resume(ctx: tanjun.abc.Context) -> None:
-    await check_voice_state(ctx)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
 
     if not node or not node.now_playing:
@@ -365,8 +371,8 @@ async def volume(ctx: tanjun.abc.Context, volume: int) -> None:
     | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("skip", "Skips the current song")
+@check_voice_state
 async def skip(ctx: tanjun.abc.Context) -> None:
-    await check_voice_state(ctx)
 
     skip = await ctx.shards.data.lavalink.skip(ctx.guild_id)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
@@ -394,8 +400,8 @@ async def skip(ctx: tanjun.abc.Context) -> None:
     | hikari.Permissions.SPEAK
 )
 @tanjun.as_slash_command("shuffle", "Shuffle the current queue")
+@check_voice_state
 async def shuffle(ctx: tanjun.abc.Context) -> None:
-    await check_voice_state(ctx)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
     if not len(node.queue) > 1:
         return ctx.respond("Only one song in the queue!")
@@ -472,15 +478,18 @@ async def lyrics(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_int_slash_option("new_index", "New Index the song is moved to")
 @tanjun.with_int_slash_option("old_index", "Song to move")
 @tanjun.as_slash_command("movesong", "Move a song to a specific index")
+@check_voice_state
 async def movesong(ctx: tanjun.abc.Context, old_index: int, new_index: int) -> None:
-    await check_voice_state(ctx)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
     if not len(node.queue) >= 1:
         return ctx.respond("Only one song in the queue!")
     queue = node.queue
     song_to_be_moved = queue[old_index]
-    queue.pop(old_index)
-    queue.insert(new_index, song_to_be_moved)
+    try:
+        queue.pop(old_index)
+        queue.insert(new_index, song_to_be_moved)
+    except IndexError:
+        raise tanjun.CommandError("No such song in the queue.")
 
     node.queue = queue
     await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
@@ -501,14 +510,17 @@ async def movesong(ctx: tanjun.abc.Context, old_index: int, new_index: int) -> N
 )
 @tanjun.with_int_slash_option("index", "Index of the Song to be removed")
 @tanjun.as_slash_command("removesong", "Remove a song at a specific index")
+@check_voice_state
 async def removesong(ctx: tanjun.abc.Context, index: int) -> None:
-    await check_voice_state(ctx)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
     if not node.queue:
         return await ctx.respond("No songs in the queue.")
-    queue = node.queue
+    queue: list = node.queue
     song_to_be_removed = queue[index]
-    queue.pop(index)
+    try:
+        queue.pop(index)
+    except IndexError:
+        raise tanjun.CommandError("No such song in the queue.")
 
     node.queue = queue
     await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
