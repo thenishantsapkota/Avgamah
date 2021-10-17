@@ -8,9 +8,11 @@ import lavasnek_rs
 import tanjun
 import yuyo
 from hikari import Embed
+from requests.api import get
 from StringProgressBar import progressBar
 
 from itsnp.core import Client
+from itsnp.utils.spotify import get_songs
 from itsnp.utils.time import *
 from itsnp.utils.utilities import _chunk
 
@@ -19,6 +21,14 @@ component = tanjun.Component()
 
 URL_REGEX = re.compile(
     r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+)
+
+SPOTIFY_TRACK = re.compile(
+    r"[\bhttps://open.\b]*spotify[\b.com\b]*[/:]*track[/:]*[A-Za-z0-9?=]+"
+)
+
+SPOTIFY_PLAYLIST = re.compile(
+    r"[\bhttps://open.\b]*spotify[\b.com\b]*[/:]*playlist[/:]*[A-Za-z0-9?=]+"
 )
 
 
@@ -42,7 +52,7 @@ def check_voice_state(f):
 
         if not voice_state_author.channel_id == voice_state_bot.channel_id:
             raise tanjun.CommandError(
-                "I cannot run this command as you are not in the same voice channel as the me."
+                "I cannot run this command as you are not in the same voice channel as me."
             )
 
         return await f(ctx, *args, **kwargs)
@@ -148,37 +158,59 @@ async def play(ctx: tanjun.abc.Context, query: str) -> None:
     if not con:
         await _join(ctx)
 
-    query_information = await ctx.shards.data.lavalink.auto_search_tracks(query)
+    if SPOTIFY_PLAYLIST.match(query) or SPOTIFY_TRACK.match(query):
+        songs = await get_songs(query)
+        await ctx.respond("Loading Playlist...\nThis may take some time.")
+        for song in songs:
+            query_information = await ctx.shards.data.lavalink.search_tracks(song)
+            try:
+                await ctx.shards.data.lavalink.play(
+                    ctx.guild_id, query_information.tracks[0]
+                ).requester(ctx.author.id).queue()
+                node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+                if not node:
+                    pass
+                else:
+                    await node.set_data({ctx.guild_id: ctx.channel_id})
+            except lavasnek_rs.NoSessionPresent:
+                return await ctx.respond("Use `/join` to run this command.")
 
-    if not query_information.tracks:
-        return await ctx.respond("I could not find any songs according to the query!")
+        await ctx.edit_last_response(f"Added Spotify Playlist `{query}` to the queue.")
 
-    try:
-        if not URL_REGEX.match(query):
-            await ctx.shards.data.lavalink.play(
-                ctx.guild_id, query_information.tracks[0]
-            ).requester(ctx.author.id).queue()
-            node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
-        else:
-            for track in query_information.tracks:
-                await ctx.shards.data.lavalink.play(ctx.guild_id, track).requester(
-                    ctx.author.id
-                ).queue()
-            node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    else:
+        query_information = await ctx.shards.data.lavalink.auto_search_tracks(query)
 
-        if not node:
-            pass
-        else:
-            await node.set_data({ctx.guild_id: ctx.channel_id})
-    except lavasnek_rs.NoSessionPresent:
-        return await ctx.respond("Use `/join` to run this command.")
+        if not query_information.tracks:
+            return await ctx.respond(
+                "I could not find any songs according to the query!"
+            )
 
-    embed = Embed(
-        title="Tracks Added",
-        description=f"[{query_information.tracks[0].info.title}]({query_information.tracks[0].info.uri})",
-        color=0x00FF00,
-    )
-    await ctx.respond(embed=embed)
+        try:
+            if not URL_REGEX.match(query):
+                await ctx.shards.data.lavalink.play(
+                    ctx.guild_id, query_information.tracks[0]
+                ).requester(ctx.author.id).queue()
+                node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+            else:
+                for track in query_information.tracks:
+                    await ctx.shards.data.lavalink.play(ctx.guild_id, track).requester(
+                        ctx.author.id
+                    ).queue()
+                node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+
+            if not node:
+                pass
+            else:
+                await node.set_data({ctx.guild_id: ctx.channel_id})
+        except lavasnek_rs.NoSessionPresent:
+            return await ctx.respond("Use `/join` to run this command.")
+
+        embed = Embed(
+            title="Tracks Added",
+            description=f"[{query_information.tracks[0].info.title}]({query_information.tracks[0].info.uri})",
+            color=0x00FF00,
+        )
+        await ctx.respond(embed=embed)
 
 
 @component.with_slash_command
@@ -302,7 +334,16 @@ async def queue(ctx: tanjun.abc.Context) -> None:
         fields.append(temp)
 
     paginator = yuyo.ComponentPaginator(
-        iter(fields), authors=(ctx.author.id,), timeout=timedelta(seconds=60)
+        iter(fields),
+        authors=(ctx.author.id,),
+        timeout=timedelta(seconds=60),
+        triggers=(
+            yuyo.pagination.LEFT_DOUBLE_TRIANGLE,
+            yuyo.pagination.LEFT_TRIANGLE,
+            yuyo.pagination.STOP_SQUARE,
+            yuyo.pagination.RIGHT_TRIANGLE,
+            yuyo.pagination.RIGHT_DOUBLE_TRIANGLE,
+        ),
     )
     if first_response := await paginator.get_next_entry():
         content, embed = first_response
@@ -456,7 +497,16 @@ async def lyrics(ctx: tanjun.abc.Context) -> None:
         for index, lyric in enumerate(_chunk(iterator, 30))
     )
     paginator = yuyo.ComponentPaginator(
-        fields, authors=(ctx.author.id,), timeout=timedelta(seconds=180)
+        fields,
+        authors=(ctx.author.id,),
+        timeout=timedelta(seconds=180),
+        triggers=(
+            yuyo.pagination.LEFT_DOUBLE_TRIANGLE,
+            yuyo.pagination.LEFT_TRIANGLE,
+            yuyo.pagination.STOP_SQUARE,
+            yuyo.pagination.RIGHT_TRIANGLE,
+            yuyo.pagination.RIGHT_DOUBLE_TRIANGLE,
+        ),
     )
     if first_response := await paginator.get_next_entry():
         content, embed = first_response
