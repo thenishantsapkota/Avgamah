@@ -10,6 +10,7 @@ import yuyo
 from hikari.embeds import Embed
 
 from itsnp.core.client import Client
+from itsnp.utils.pagination import paginate
 from itsnp.utils.permissions import Permissions
 from itsnp.utils.time import TimeConverter, pretty_datetime, pretty_timedelta
 from itsnp.utils.utilities import _chunk
@@ -41,6 +42,7 @@ async def warning_count(ctx: tanjun.abc.Context, member: hikari.Member) -> None:
     | hikari.Permissions.MANAGE_ROLES
     | hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_str_slash_option("reason", "Reason to mute the user")
 @tanjun.with_str_slash_option("time", "Time to mute the user for")
@@ -121,6 +123,7 @@ async def mute_handler(
     | hikari.Permissions.MANAGE_ROLES
     | hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_str_slash_option("reason", "Reason to unmute the user", default=False)
 @tanjun.with_member_slash_option("member", "Member to mutes")
@@ -190,6 +193,7 @@ async def unmute_handler(
     | hikari.Permissions.MANAGE_ROLES
     | hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_str_slash_option("reason", "Reason to kick the member.")
 @tanjun.with_member_slash_option("member", "A member to kick")
@@ -244,6 +248,7 @@ async def kick_handler(
     | hikari.Permissions.MANAGE_ROLES
     | hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_str_slash_option("reason", "Reason to ban the member")
 @tanjun.with_member_slash_option("member", "Member to ban")
@@ -280,6 +285,7 @@ async def ban_command(
     | hikari.Permissions.MANAGE_ROLES
     | hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_str_slash_option("reason", "Reason to Unban the user")
 @tanjun.with_str_slash_option("user_id", "ID of the user that needs to be unbanned.")
@@ -313,6 +319,7 @@ async def unban_command(ctx: tanjun.abc.Context, user_id: int, reason: str) -> N
     hikari.Permissions.MANAGE_MESSAGES
     | hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_str_slash_option("reason", "Reason to warn the member")
 @tanjun.with_member_slash_option("member", "Member to warn")
@@ -359,6 +366,7 @@ warnings_group = tanjun.slash_command_group("warnings", "Group that handles warn
     hikari.Permissions.MANAGE_MESSAGES
     | hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_member_slash_option("member", "Member whose warnings you wanna see.")
 @tanjun.as_slash_command("list", "List the warnings of a member")
@@ -388,15 +396,7 @@ async def warnings_list(ctx: tanjun.abc.Context, member: hikari.Member) -> None:
         for index, warning in enumerate(_chunk(warnings, 5))
     )
 
-    paginator = yuyo.ComponentPaginator(fields, authors=(ctx.author.id,))
-    yuyo.ComponentExecutor(timeout=timedelta(seconds=60))
-    if first_response := await paginator.get_next_entry():
-        content, embed = first_response
-        message = await ctx.respond(
-            content=content, component=paginator, embed=embed, ensure_result=True
-        )
-        ctx.shards.component_client.add_executor(message, paginator)
-        return
+    await paginate(ctx, fields, 180)
 
 
 @warnings_group.with_command
@@ -404,6 +404,7 @@ async def warnings_list(ctx: tanjun.abc.Context, member: hikari.Member) -> None:
     hikari.Permissions.MANAGE_MESSAGES
     | hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_int_slash_option("id", "ID of the Warning")
 @tanjun.with_member_slash_option("member", "Member whose warning is to be deleted")
@@ -430,6 +431,12 @@ async def warnings_delete(
 
 
 @warnings_group.with_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.MANAGE_MESSAGES
+    | hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.with_member_slash_option("member", "Member whose warnings are to be cleared")
 @tanjun.as_slash_command("clear", "Clear warnings of a user")
 async def warnings_clear(ctx: tanjun.abc.Context, member: hikari.Member) -> None:
