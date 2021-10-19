@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hikari-bot"
-version = "0.1.0"
+version = "1.0.0"
 description = ""
 authors = ["Nishant Sapkota"]
 license = "MIT"
@@ -17,10 +17,10 @@ hikari-tanjun = {git = "https://github.com/FasterSpeeding/Tanjun"}
 APScheduler = "^3.8.0"
 bs4 = "^0.0.1"
 psutil = "^5.8.0"
-hikari-lightbulb = {git = "https://github.com/tandemdude/hikari-lightbulb"}
 hikari-yuyo = {git= "https://github.com/FasterSpeeding/Yuyo"}
 lavasnek-rs = {git = "https://github.com/vicky5124/lavasnek_rs"}
 nepali-date = "^2.0.5"
+spotipy = "^2.19.0"
 
 [tool.poetry.dev-dependencies]
 black = "^21.9b0"

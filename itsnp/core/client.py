@@ -17,7 +17,9 @@ class Client(tanjun.Client):
         super().load_modules(
             *[f"itsnp.modules.{m.stem}" for m in Path("./itsnp/modules").glob("*.py")]
         )
-
+        """
+        super().load_modules(*[f"itsnp.modules.{m.stem}" for m in Path("./itsnp/modules").glob("**/*.py", recursive=True)])
+        """
         return self
 
 
