@@ -16,7 +16,7 @@ course_obj = Courses()
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
+    | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_str_slash_option("course_topic", "Topic the course is about")
 @tanjun.as_slash_command("freecourses", "Get a link of free courses.")
