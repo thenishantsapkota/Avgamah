@@ -17,8 +17,7 @@ permissions = Permissions()
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.MANAGE_CHANNELS
-    | hikari.Permissions.MANAGE_GUILD
+    | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_channel_slash_option(
     "channel", "The channel you want to set as Welcome Channel"
@@ -50,8 +49,7 @@ async def set_welcome_channel(
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.MANAGE_ROLES
-    | hikari.Permissions.MANAGE_GUILD
+    | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_str_slash_option(
     "message", "The Welcome message for the server", default=None
