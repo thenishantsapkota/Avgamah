@@ -11,10 +11,8 @@ import tanjun
 from hikari import Embed
 from hikari import __version__ as hikari_version
 from hikari.messages import ButtonStyle
-from lightbulb import __version__ as lighbulb_version
 from psutil import Process, virtual_memory
 from tanjun import __version__ as tanjun_version
-from tanjun import components
 
 from itsnp import __version__ as bot_version
 from itsnp.core.client import Client
@@ -43,7 +41,6 @@ PLATFORM = list(LINKS_DICT.keys())
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.as_slash_command("hello", "Greet the user with hello.")
@@ -56,7 +53,6 @@ async def hello_command(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.as_slash_command("ping", "Return bot ping.")
@@ -77,7 +73,6 @@ async def ping_command(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_str_slash_option(
@@ -98,7 +93,6 @@ async def link_command(ctx: tanjun.abc.Context, platform: str) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_member_slash_option("member", "Get member.")
@@ -119,7 +113,6 @@ async def avatar_command(
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.as_slash_command("links", "Get all ITSNP Links")
@@ -188,7 +181,6 @@ async def serverinfo_command(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_member_slash_option("member", "Choose a member", default=False)
@@ -246,7 +238,6 @@ async def userinfo_command(ctx: tanjun.abc.Context, member: hikari.Member) -> No
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.as_slash_command("botinfo", "View Bot's info")
@@ -266,7 +257,7 @@ async def botinfo_command(ctx: tanjun.abc.Context) -> None:
         title=f"{await ctx.rest.fetch_my_user()}'s Information",
         color=0xF1C40F,
         timestamp=datetime.now().astimezone(),
-        description=f"```Language : Python\nPython Version : {python_version()}\nBot Version : {bot_version}\nLibrary : hikari.py\nCommand Handler :\nhikari-tanjun(Slash Commands)\nhikari-lightbulb(Message Commands)\nHikari Version : {hikari_version}\nTanjun Version : {tanjun_version}\nLightbulb Version : {lighbulb_version}\nUptime : {pretty_uptime}\nCPU Time : {pretty_cpu_time}\nMemory Usage : {mem_usage:,.3f} MiB /{mem_total:,.0f} MiB\nPrefix : /\nClient ID : {bot.id}```",
+        description=f"```Language : Python\nPython Version : {python_version()}\nBot Version : {bot_version}\nLibrary : hikari.py\nCommand Handler : hikari-tanjun\nHikari Version : {hikari_version}\nTanjun Version : {tanjun_version}\nUptime : {pretty_uptime}\nCPU Time : {pretty_cpu_time}\nMemory Usage : {mem_usage:,.3f} MiB /{mem_total:,.0f} MiB\nPrefix : /\nClient ID : {bot.id}```",
     )
     embed.set_thumbnail(bot.avatar_url)
     fields = [("Owner <:crown:879222224438059049>", f"<@852617608309112882>")]
@@ -290,7 +281,6 @@ async def botinfo_command(ctx: tanjun.abc.Context) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_str_slash_option("city", "A city's name")
@@ -344,7 +334,6 @@ async def weather_command(ctx: tanjun.abc.Context, *, city: str) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_str_slash_option("ip", "IP Address you want to lookup")
@@ -389,7 +378,6 @@ async def ipinfo_command(ctx: tanjun.abc.Context, ip: str) -> None:
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
-    | hikari.Permissions.READ_MESSAGE_HISTORY
     | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.as_slash_command("botinvite", "Invite Link for the bot")
