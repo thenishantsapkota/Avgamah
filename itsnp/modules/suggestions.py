@@ -10,7 +10,12 @@ component = tanjun.Component()
 
 
 @component.with_slash_command
-@tanjun.with_own_permission_check(hikari.Permissions.ADD_REACTIONS)
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.ADD_REACTIONS
+)
 @tanjun.with_str_slash_option("suggestion", "A suggestion.")
 @tanjun.as_slash_command("suggest", "Give a suggestion for the server.")
 async def add_suggestion_command(ctx: tanjun.abc.Context, *, suggestion: str) -> None:
@@ -28,9 +33,10 @@ async def add_suggestion_command(ctx: tanjun.abc.Context, *, suggestion: str) ->
 
 @component.with_slash_command
 @tanjun.with_own_permission_check(
-    hikari.Permissions.MANAGE_MESSAGES
-    | hikari.Permissions.MANAGE_MESSAGES
-    | hikari.Permissions.MANAGE_GUILD
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.ADD_REACTIONS
 )
 @tanjun.with_str_slash_option("message_id", "Message ID of the suggestion")
 @tanjun.as_slash_command("approve", "Approve the suggestion", default_to_ephemeral=True)
@@ -49,7 +55,12 @@ async def approve_command(ctx: tanjun.abc.Context, message_id: str) -> None:
 
 
 @component.with_slash_command
-@tanjun.with_own_permission_check(hikari.Permissions.MANAGE_MESSAGES)
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
+    | hikari.Permissions.ADD_REACTIONS
+)
 @tanjun.with_author_permission_check(hikari.Permissions.MANAGE_GUILD)
 @tanjun.with_str_slash_option("message_id", "Message ID of the suggestion")
 @tanjun.with_str_slash_option("reason", "Reason for denial of the suggestion")
