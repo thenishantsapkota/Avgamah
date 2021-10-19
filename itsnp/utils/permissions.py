@@ -1,27 +1,18 @@
+from __future__ import annotations
+
+# from typing import Any, Iterable, Optional, TypeVar, Union
+import typing as t
 from operator import attrgetter
-from typing import Any, Iterable, Optional, TypeVar, Union
 
 import hikari
 import tanjun
 
-T = TypeVar("T")
+T = t.TypeVar("T")
 
 from models import ModerationRoles
 
 
-class NotEnoughPermissions(tanjun.CommandError):
-    pass
-
-
-class SetModerationRoles(tanjun.CommandError):
-    pass
-
-
-class NotHigherRole(tanjun.CommandError):
-    pass
-
-
-def get(iterable: Iterable[T], **attrs: Any) -> Optional[T]:
+def get(iterable: t.Iterable[T], **attrs: t.Any) -> t.Optional[T]:
     """A helper that returns the first element in the iterable that meets
     all the traits passed in ``attrs``.
     Args:
@@ -74,7 +65,7 @@ class Permissions:
     async def fetch_role_data(self, guild: hikari.Guild) -> dict:
         model = await ModerationRoles.get_or_none(guild_id=guild.id)
         if model is None:
-            raise SetModerationRoles(
+            raise tanjun.CommandError(
                 """
             Please setup moderation roles before using any moderation commands.
             Use `/role admin <roleid>`, `/role mod <roleid>`, `/role staff <roleid>` to set moderation roles.
@@ -207,9 +198,7 @@ class Permissions:
                 "**You cannot run moderation actions on the users on same rank as you or higher than you.<:jhyama:889855700229058640>**"
             )
 
-    async def check_booster_role(
-        self, member: hikari.Member
-    ) -> Union[hikari.Role, None]:
+    async def check_booster_role(self, member: hikari.Member) -> hikari.Role | None:
         """Function that checks for booster role in the guild
 
         Args:
