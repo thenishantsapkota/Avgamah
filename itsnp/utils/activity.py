@@ -20,6 +20,11 @@ class CustomActivity:
         self._statuses = cycle(
             [
                 hikari.Activity(
+                    type=hikari.ActivityType.STREAMING,
+                    name="Sus Things",
+                    url="https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                ),
+                hikari.Activity(
                     type=hikari.ActivityType.PLAYING, name=f"https://discord.itsnp.org"
                 ),
                 hikari.Activity(
@@ -46,4 +51,4 @@ class CustomActivity:
             await self.bot.update_presence(
                 activity=new_presence, status=hikari.Status.IDLE
             )
-            await asyncio.sleep(10)
+            await asyncio.sleep(20)
