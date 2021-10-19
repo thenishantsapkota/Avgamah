@@ -12,6 +12,7 @@ from requests.api import get
 from StringProgressBar import progressBar
 
 from itsnp.core import Client
+from itsnp.utils.pagination import paginate
 from itsnp.utils.spotify import get_songs
 from itsnp.utils.time import *
 from itsnp.utils.utilities import _chunk
@@ -21,10 +22,6 @@ component = tanjun.Component()
 
 URL_REGEX = re.compile(
     r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-)
-
-SPOTIFY_TRACK = re.compile(
-    r"[\bhttps://open.\b]*spotify[\b.com\b]*[/:]*track[/:]*[A-Za-z0-9?=]+"
 )
 
 SPOTIFY_PLAYLIST = re.compile(
@@ -158,7 +155,7 @@ async def play(ctx: tanjun.abc.Context, query: str) -> None:
     if not con:
         await _join(ctx)
 
-    if SPOTIFY_PLAYLIST.match(query) or SPOTIFY_TRACK.match(query):
+    if SPOTIFY_PLAYLIST.match(query):
         songs = await get_songs(query)
         await ctx.respond("Loading Playlist...\nThis may take some time.")
         for song in songs:
@@ -333,25 +330,7 @@ async def queue(ctx: tanjun.abc.Context) -> None:
         temp.append(embed)
         fields.append(temp)
 
-    paginator = yuyo.ComponentPaginator(
-        iter(fields),
-        authors=(ctx.author.id,),
-        timeout=timedelta(seconds=60),
-        triggers=(
-            yuyo.pagination.LEFT_DOUBLE_TRIANGLE,
-            yuyo.pagination.LEFT_TRIANGLE,
-            yuyo.pagination.STOP_SQUARE,
-            yuyo.pagination.RIGHT_TRIANGLE,
-            yuyo.pagination.RIGHT_DOUBLE_TRIANGLE,
-        ),
-    )
-    if first_response := await paginator.get_next_entry():
-        content, embed = first_response
-        message = await ctx.respond(
-            content=content, component=paginator, embed=embed, ensure_result=True
-        )
-        ctx.shards.component_client.add_executor(message, paginator)
-        return
+    await paginate(ctx, fields, 180)
 
 
 @component.with_slash_command
@@ -496,25 +475,7 @@ async def lyrics(ctx: tanjun.abc.Context) -> None:
         )
         for index, lyric in enumerate(_chunk(iterator, 30))
     )
-    paginator = yuyo.ComponentPaginator(
-        fields,
-        authors=(ctx.author.id,),
-        timeout=timedelta(seconds=180),
-        triggers=(
-            yuyo.pagination.LEFT_DOUBLE_TRIANGLE,
-            yuyo.pagination.LEFT_TRIANGLE,
-            yuyo.pagination.STOP_SQUARE,
-            yuyo.pagination.RIGHT_TRIANGLE,
-            yuyo.pagination.RIGHT_DOUBLE_TRIANGLE,
-        ),
-    )
-    if first_response := await paginator.get_next_entry():
-        content, embed = first_response
-        message = await ctx.respond(
-            content=content, component=paginator, embed=embed, ensure_result=True
-        )
-        ctx.shards.component_client.add_executor(message, paginator)
-        return
+    await paginate(ctx, fields, 180)
 
 
 @component.with_slash_command
