@@ -1,14 +1,18 @@
 import warnings
+from datetime import datetime
 
 import aiohttp
 import hikari
 import tanjun
 from hikari import Embed
+from tanjun.clients import as_loader
 
 from itsnp.core.client import Client
 from itsnp.utils.buttons import create_source_button
 from itsnp.utils.fuzzy import *
+from itsnp.utils.pagination import paginate
 from itsnp.utils.rtfm import *
+from itsnp.utils.utilities import _chunk
 
 component = tanjun.Component()
 
@@ -116,34 +120,24 @@ async def rtfm_command(ctx: tanjun.abc.Context, doc: str, *, term: str) -> None:
         await build(target)
         caches = cache.get(target)
 
-    results = finder(term, list(caches.items()), key=lambda x: x[0], lazy=False)[:10]
+    results = finder(term, list(caches.items()), key=lambda x: x[0], lazy=False)[:20]
 
     if not results:
         return await ctx.respond("Couldn't find any results")
-
-    ##Using Buttons
-    # rows = []
-    # for i in range(0, len(results), 5):
-    #     row = ctx.rest.build_action_row()
-    #     for result in results[i: i+5]:
-    #         (
-    #             row.add_button(ButtonStyle.LINK, result[1])
-    #             .set_label(result[0])
-    #             .add_to_container()
-    #         )
-    #     rows.append(row)
-
-    # await ctx.respond(f"**Searched in {target}**", components=rows)
-    ##Using Embeds
-    button = create_source_button(ctx, TARGETS[doc])
-    await ctx.respond(
-        embed=Embed(
-            title=f"Searched in {target}",
-            description="\n".join([f"[`{key}`]({url})" for key, url in results]),
-            color=0xF1C40F,
-        ),
-        component=button,
+    fields = (
+        (
+            hikari.UNDEFINED,
+            hikari.Embed(
+                title=f"Searched in {target}",
+                description="\n".join([f"[`{key}`]({url})" for key, url in result]),
+                color=0x00FF00,
+                timestamp=datetime.now().astimezone(),
+            ).set_footer(f"Page {index+1}"),
+        )
+        for index, result in enumerate(_chunk(results, 5))
     )
+
+    await paginate(ctx, fields, 180)
 
 
 @component.with_slash_command
@@ -158,7 +152,7 @@ async def rtfm_command(ctx: tanjun.abc.Context, doc: str, *, term: str) -> None:
 )
 async def rtfmlist_command(ctx: tanjun.abc.Context) -> None:
     aliases = {v: k for k, v in ALIASES.items()}
-    embed = Embed(title="RTFM list of avaliable modules", color=0xF1C40F)
+    embed = hikari.Embed(title="RTFM list of avaliable modules", color=0xF1C40F)
     embed.description = "\n".join(
         [
             "[{0}]({1}): {2}".format(
