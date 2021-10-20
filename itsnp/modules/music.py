@@ -8,7 +8,6 @@ import lavasnek_rs
 import tanjun
 import yuyo
 from hikari import Embed
-from requests.api import get
 from StringProgressBar import progressBar
 
 from itsnp.core import Client
@@ -330,7 +329,9 @@ async def queue(ctx: tanjun.abc.Context) -> None:
         temp.append(embed)
         fields.append(temp)
 
-    await paginate(ctx, fields, 180)
+    iter_fields = iter(fields)
+
+    await paginate(ctx, iter_fields, 180)
 
 
 @component.with_slash_command
@@ -367,8 +368,8 @@ async def resume(ctx: tanjun.abc.Context) -> None:
 )
 @tanjun.with_int_slash_option("volume", "Volume to be set (Between 0 and 100)")
 @tanjun.as_slash_command("volume", "Increase/Decrease the volume")
+@check_voice_state
 async def volume(ctx: tanjun.abc.Context, volume: int) -> None:
-    await check_voice_state(ctx)
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
 
     if not node or not node.now_playing:
@@ -473,7 +474,7 @@ async def lyrics(ctx: tanjun.abc.Context) -> None:
             .set_footer(text=f"Page {index+1}")
             .set_author(name=f"{song_name}", url=f"{node.now_playing.track.info.uri}"),
         )
-        for index, lyric in enumerate(_chunk(iterator, 30))
+        for index, lyric in enumerate(_chunk(iterator, 20))
     )
     await paginate(ctx, fields, 180)
 
