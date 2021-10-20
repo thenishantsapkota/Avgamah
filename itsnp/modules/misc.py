@@ -257,12 +257,29 @@ async def botinfo_command(ctx: tanjun.abc.Context) -> None:
         title=f"{await ctx.rest.fetch_my_user()}'s Information",
         color=0xF1C40F,
         timestamp=datetime.now().astimezone(),
-        description=f"```Language : Python\nPython Version : {python_version()}\nBot Version : {bot_version}\nLibrary : hikari.py\nCommand Handler : hikari-tanjun\nHikari Version : {hikari_version}\nTanjun Version : {tanjun_version}\nUptime : {pretty_uptime}\nCPU Time : {pretty_cpu_time}\nMemory Usage : {mem_usage:,.3f} MiB /{mem_total:,.0f} MiB\nPrefix : /\nClient ID : {bot.id}```",
     )
     embed.set_thumbnail(bot.avatar_url)
-    fields = [("Owner <:crown:879222224438059049>", f"<@852617608309112882>")]
-    for name, value in fields:
-        embed.add_field(name=name, value=value)
+    fields = [
+        ("Language", "Python", True),
+        ("Python Version", python_version(), True),
+        ("Bot Version", "1.0.0", True),
+        ("Library", f"hikari-py v{hikari_version}", True),
+        ("Command Handler", f"hikari-tanjun v{tanjun_version}", True),
+        ("Uptime", pretty_uptime, True),
+        ("CPU Time", pretty_cpu_time, True),
+        ("Memory Usage", f"{mem_usage:,.0f} MiB /{mem_total:,.0f} MiB", True),
+        ("Prefix", "/", True),
+        ("Total Guild Channels", len(ctx.cache.get_guild_channels_view()), True),
+        (
+            "Total Members",
+            sum(len(record) for record in ctx.cache.get_members_view().values()),
+            True,
+        ),
+        ("Total Guilds", len(ctx.cache.get_available_guilds_view()), True),
+        ("Owner <:crown:879222224438059049>", f"<@852617608309112882>", True),
+    ]
+    for name, value, inline in fields:
+        embed.add_field(name=name, value=value, inline=inline)
 
     button = (
         ctx.rest.build_action_row()
@@ -271,6 +288,12 @@ async def botinfo_command(ctx: tanjun.abc.Context) -> None:
         .add_to_container()
         .add_button(ButtonStyle.LINK, "https://github.com/thenishantsapkota/Hikari-Bot")
         .set_label("Source")
+        .add_to_container()
+        .add_button(
+            ButtonStyle.LINK,
+            f"https://discord.com/api/oauth2/authorize?client_id={bot.id}&permissions=8&scope=bot%20applications.commands",
+        )
+        .set_label("Invite Me")
         .add_to_container()
     )
 
