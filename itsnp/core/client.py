@@ -14,12 +14,10 @@ class Client(tanjun.Client):
         super().__init__(*args, **kwargs)
 
     def load_modules(self: _ClientT) -> _ClientT:
-        super().load_modules(
-            *[f"itsnp.modules.{m.stem}" for m in Path("./itsnp/modules").glob("*.py")]
-        )
-        """
-        super().load_modules(*[f"itsnp.modules.{m.stem}" for m in Path("./itsnp/modules").glob("**/*.py", recursive=True)])
-        """
+        path = Path("./itsnp/modules")
+
+        for ext in path.glob(("**/") + "[!_]*.py"):
+            super().load_modules(".".join([*ext.parts[:-1], ext.stem]))
         return self
 
 

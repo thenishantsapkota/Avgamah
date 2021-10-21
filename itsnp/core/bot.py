@@ -2,8 +2,7 @@ import asyncio
 import logging
 import os
 import typing as t
-from datetime import datetime, timedelta
-from pathlib import Path
+from datetime import datetime
 
 import hikari
 import lavasnek_rs

@@ -2,7 +2,6 @@ import logging
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-import hikari
 from hikari import Embed
 
 if TYPE_CHECKING:
