@@ -89,7 +89,7 @@ class Bot(hikari.GatewayBot):
     async def on_shard_ready(self, event: hikari.ShardReadyEvent) -> None:
         builder = (
             lavasnek_rs.LavalinkBuilder(self.get_me().id, os.environ.get("BOT_TOKEN"))
-            .set_host("127.0.0.1")
+            .set_host("lavalink")
             .set_password(os.environ.get("LAVALINK_PASSWORD"))
         )
 

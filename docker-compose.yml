@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+    db:
+      image: postgres:13
+      restart: always
+      expose:
+        - 5432
+      environment:
+        POSTGRES_USER: nishant
+        POSTGRES_PASSWORD: test123
+        POSTGRES_DB: bot_db
+      volumes:
+        - postgres-data:/var/lib/postgresql/data
+
+    bot:
+        build: .
+        env_file: .env
+        depends_on:
+            - db
+            - lavalink
+        links: 
+            - db:postgres
+            - lavalink:lavalink
+        command: ["./entrypoint.sh"]
+    
+    
+    lavalink:
+        image: samrid/ready-lavalink
+    
+volumes:
+    postgres-data:
