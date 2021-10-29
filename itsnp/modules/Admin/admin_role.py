@@ -12,6 +12,7 @@ admin_role_component = tanjun.Component()
 
 
 @role_group.with_command
+@tanjun.with_guild_check
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL

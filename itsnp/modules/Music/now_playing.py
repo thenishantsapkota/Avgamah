@@ -5,7 +5,7 @@ import tanjun
 from StringProgressBar import progressBar
 
 from itsnp.core.client import Client
-from itsnp.utils.time import *
+from itsnp.utils.time import pretty_timedelta_shortened
 
 now_playing_component = tanjun.Component()
 
@@ -34,7 +34,9 @@ async def now_playing(ctx: tanjun.abc.Context) -> None:
     )
 
     progress_bar = progressBar.createBoxDiscord(
-        node.now_playing.track.info.position, node.now_playing.track.info.length, 15
+        node.now_playing.track.info.position,
+        node.now_playing.track.info.length,
+        15,
     )
 
     embed = hikari.Embed(

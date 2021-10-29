@@ -22,7 +22,9 @@ set_message_component = tanjun.Component()
     "message", "The Welcome message for the server", default=None
 )
 @tanjun.as_slash_command(
-    "setwelcomemessage", "Set welcome message for the guild.", default_to_ephemeral=True
+    "setwelcomemessage",
+    "Set welcome message for the guild.",
+    default_to_ephemeral=True,
 )
 async def set_welcome_message(
     ctx: tanjun.abc.Context, message: t.Optional[str]

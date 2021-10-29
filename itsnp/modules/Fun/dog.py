@@ -27,7 +27,7 @@ async def dog_command(ctx: tanjun.abc.Context) -> None:
         timestamp=datetime.now().astimezone(),
         description=f"```{dog_json['fact']}```",
     )
-    embed.set_author(name=f"Here's a dog for you!")
+    embed.set_author(name="Here's a dog for you!")
     embed.set_image(dog_json["image"])
     embed.set_footer(text=f"Requested by {ctx.author}")
     button = create_source_button(ctx, "https://some-random-api.ml/")

@@ -1,12 +1,7 @@
-import asyncio
-from datetime import datetime
-
 import hikari
 import tanjun
 
 from itsnp.core.client import Client
-from itsnp.utils.time import *
-from models import MuteModel
 
 from . import kick_handler, permissions
 

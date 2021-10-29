@@ -1,5 +1,3 @@
-import random
-
 import hikari
 import tanjun
 from hikari.messages import ButtonStyle
@@ -31,7 +29,9 @@ PLATFORM = list(LINKS_DICT.keys())
     | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_str_slash_option(
-    "platform", "The link to show", choices=(l.lower() for l in PLATFORM)
+    "platform",
+    "The link to show",
+    choices=(choice.lower() for choice in PLATFORM),
 )
 @tanjun.as_slash_command("link", "Show different ITSNP link")
 async def link_command(ctx: tanjun.abc.Context, platform: str) -> None:

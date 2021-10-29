@@ -3,9 +3,8 @@ import lavasnek_rs
 import tanjun
 
 from itsnp.core.client import Client
-from itsnp.utils.spotify import get_songs
 
-from . import SPOTIFY_PLAYLIST, URL_REGEX, _join
+from . import URL_REGEX, _join
 
 play_component = tanjun.Component()
 
@@ -25,26 +24,6 @@ async def play(ctx: tanjun.abc.Context, query: str) -> None:
 
     if not con:
         await _join(ctx)
-
-    # if SPOTIFY_PLAYLIST.match(query):
-    #     songs = await get_songs(query)
-    #     await ctx.respond("Loading Playlist...\nThis may take some time.")
-    #     for song in songs:
-    #         query_information = await ctx.shards.data.lavalink.search_tracks(song)
-    #         try:
-    #             await ctx.shards.data.lavalink.play(
-    #                 ctx.guild_id, query_information.tracks[0]
-    #             ).requester(ctx.author.id).queue()
-    #             node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
-    #             if not node:
-    #                 pass
-    #             else:
-    #                 await node.set_data({ctx.guild_id: ctx.channel_id})
-    #         except lavasnek_rs.NoSessionPresent:
-    #             return await ctx.respond("Use `/join` to run this command.")
-
-    #     await ctx.edit_last_response(f"Added Spotify Playlist `{query}` to the queue.")
-
     query_information = await ctx.shards.data.lavalink.auto_search_tracks(query)
 
     if not query_information.tracks:

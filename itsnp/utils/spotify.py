@@ -12,7 +12,8 @@ load_dotenv()
 
 async def get_tracks_from_playlist(playlist_url):
     credentials = SpotifyClientCredentials(
-        os.environ.get("SPOTIFY_CLIENT_ID"), os.environ.get("SPOTIFY_CLIENT_SECRET")
+        os.environ.get("SPOTIFY_CLIENT_ID"),
+        os.environ.get("SPOTIFY_CLIENT_SECRET"),
     )
     spotify = spotipy.Spotify(client_credentials_manager=credentials)
 

@@ -104,7 +104,9 @@ async def build(target) -> None:
 )
 @tanjun.with_str_slash_option("term", "Term to search for")
 @tanjun.with_str_slash_option(
-    "doc", "Documentation of Library", choices=(l.lower() for l in TARGETS.keys())
+    "doc",
+    "Documentation of Library",
+    choices=(l.lower() for l in TARGETS.keys()),
 )
 @tanjun.as_slash_command("rtfm", "Search through docs of a module/python")
 async def rtfm_command(ctx: tanjun.abc.Context, doc: str, *, term: str) -> None:

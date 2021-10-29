@@ -28,7 +28,11 @@ async def serverinfo_command(ctx: tanjun.abc.Context) -> None:
         ),
         ("Total Channels", len(guild.get_channels()), True),
         ("Boost Count", guild.premium_subscription_count, True),
-        ("Premium Tier", str(guild.premium_tier).replace("_", " ").title(), True),
+        (
+            "Premium Tier",
+            str(guild.premium_tier).replace("_", " ").title(),
+            True,
+        ),
         ("Role Count", len(guild.get_roles()), True),
         (
             "Vanity URL",

@@ -1,10 +1,12 @@
+import logging
 from datetime import datetime
 
 import hikari
 import tanjun
 
 from itsnp.core import Client
-from models import MemberJoinModel
+from itsnp.utils.utilities import get
+from models import MemberJoinModel, MuteModel
 
 component = tanjun.Component()
 
@@ -13,10 +15,21 @@ component = tanjun.Component()
 async def on_member_join(event: hikari.MemberCreateEvent) -> None:
     if not event.member.user.is_bot:
         default = "Enjoy your stay here."
+        muted_role = get(await event.app.rest.fetch_roles(event.guild_id), name="Muted")
+        mute_query = await MuteModel.get_or_none(member_id=event.member.id)
+        try:
+            if mute_query.member_id == event.member.id:
+                await event.member.edit(
+                    roles=[muted_role], reason="Member was muted previously"
+                )
+        except Exception as e:
+            logging.info(f"Exception {e} occured in {event.get_guild()}")
+            pass
         query = await MemberJoinModel.get_or_none(guild_id=event.guild_id)
-        message = query.welcome_message
-        guild = event.get_guild()
-        channel = guild.get_channel(query.channel_id)
+        if query:
+            message = query.welcome_message
+            guild = event.get_guild()
+            channel = guild.get_channel(query.channel_id)
         try:
             if guild.get_member(event.member.user.id) is not None:
                 embed = hikari.Embed(
@@ -42,7 +55,8 @@ async def on_member_join(event: hikari.MemberCreateEvent) -> None:
                 await channel.send(
                     event.member.mention, embed=embed, user_mentions=True
                 )
-        except:
+        except Exception as e:
+            logging.info(f"Exception {e} occured in {event.get_guild()}")
             pass
 
 

@@ -7,8 +7,6 @@ from itsnp.core.client import Client
 from itsnp.utils.pagination import paginate
 from itsnp.utils.utilities import _chunk
 
-from . import check_voice_state
-
 queue_component = tanjun.Component()
 
 

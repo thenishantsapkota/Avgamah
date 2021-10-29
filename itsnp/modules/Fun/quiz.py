@@ -1,14 +1,12 @@
 import html
 import random
 from datetime import timedelta
-from math import tan
 
 import aiohttp
 import hikari
 import tanjun
 import yuyo
 
-from itsnp.core import Bot
 from itsnp.core.client import Client
 
 from . import categories, categories_keys
@@ -31,7 +29,9 @@ async def on_select_menu_interaction(ctx: yuyo.ComponentContext):
     ),
 )
 @tanjun.with_str_slash_option(
-    "category", "Category of the Question", choices=(c.lower() for c in categories_keys)
+    "category",
+    "Category of the Question",
+    choices=(c.lower() for c in categories_keys),
 )
 @tanjun.as_slash_command("quiz", "Get a quiz question")
 async def quiz(ctx: tanjun.abc.Context, category: str, difficulty: str) -> None:
@@ -50,7 +50,8 @@ async def quiz(ctx: tanjun.abc.Context, category: str, difficulty: str) -> None:
     embed = hikari.Embed(
         title=html.unescape(results["question"]),
         description="\n".join(
-            f"```{index+1}) {value}```" for index, value in enumerate(answers)
+            f"```{index+1}) {html.unescape(value)}```"
+            for index, value in enumerate(answers)
         ),
     )
     select_menu = (
@@ -60,22 +61,24 @@ async def quiz(ctx: tanjun.abc.Context, category: str, difficulty: str) -> None:
     )
 
     for answer in answers:
-        select_menu.add_option(answer, answer.lower()).add_to_menu()
+        select_menu.add_option(html.unescape(answer), answer.lower()).add_to_menu()
 
     message = await ctx.respond(
-        embed=embed, component=select_menu.add_to_container(), ensure_result=True
+        embed=embed,
+        component=select_menu.add_to_container(),
+        ensure_result=True,
     )
 
     executor = yuyo.components.WaitFor(
         authors=(ctx.author,), timeout=timedelta(minutes=10)
     )
-    ctx.shards.component_client.add_executor(message.id, executor)
+    ctx.shards.component_client.set_executor(message.id, executor)
     component_ctx = await executor.wait_for()
     for value in component_ctx.interaction.values:
         if value.title() == (results["correct_answer"]).title():
             embed.color = 0x00FF00
             embed.add_field(
-                name=f"Correct Answer!",
+                name="Correct Answer!",
                 value=f"You chose `{component_ctx.interaction.values[0].title()}`\nGood.\nYou seem smart to me:heart_eyes: ",
             )
             await ctx.edit_initial_response(embed=embed, components=[])
@@ -87,7 +90,9 @@ async def quiz(ctx: tanjun.abc.Context, category: str, difficulty: str) -> None:
                 inline=True,
             )
             embed.add_field(
-                name="Correct Answer", value=results["correct_answer"], inline=True
+                name="Correct Answer",
+                value=results["correct_answer"],
+                inline=True,
             )
             await ctx.edit_last_response(embed=embed, components=[])
 

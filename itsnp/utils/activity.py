@@ -25,19 +25,21 @@ class CustomActivity:
                     url="https://www.youtube.com/watch?v=dQw4w9WgXcQ",
                 ),
                 hikari.Activity(
-                    type=hikari.ActivityType.PLAYING, name=f"https://discord.itsnp.org"
+                    type=hikari.ActivityType.PLAYING,
+                    name="https://discord.itsnp.org",
                 ),
                 hikari.Activity(
-                    type=hikari.ActivityType.WATCHING, name=f"Slash Commands are here!!"
+                    type=hikari.ActivityType.WATCHING,
+                    name="Slash Commands are here!!",
                 ),
                 hikari.Activity(
                     type=hikari.ActivityType.WATCHING,
                     name=f"Nothing Sus | Version {__version__}",
                 ),
-                hikari.Activity(type=hikari.ActivityType.PLAYING, name=f"Minecraft"),
+                hikari.Activity(type=hikari.ActivityType.PLAYING, name="Minecraft"),
                 hikari.Activity(
                     type=hikari.ActivityType.WATCHING,
-                    name=f"/botinfo to see my source!",
+                    name="/botinfo to see my source!",
                 ),
             ]
         )

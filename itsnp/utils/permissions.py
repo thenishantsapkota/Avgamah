@@ -1,43 +1,13 @@
 from __future__ import annotations
 
-# from typing import Any, Iterable, Optional, TypeVar, Union
-import typing as t
-from operator import attrgetter
-
 import hikari
 import tanjun
 
-T = t.TypeVar("T")
-
 from models import ModerationRoles
 
+from .utilities import get
 
-def get(iterable: t.Iterable[T], **attrs: t.Any) -> t.Optional[T]:
-    """A helper that returns the first element in the iterable that meets
-    all the traits passed in ``attrs``.
-    Args:
-        iterable (Iterable): An iterable to search through.
-        **attrs (Any): Keyword arguments that denote attributes to search with.
-    """
-    attrget = attrgetter
-
-    # Special case the single element call
-    if len(attrs) == 1:
-        k, v = attrs.popitem()
-        pred = attrget(k.replace("__", "."))
-        for elem in iterable:
-            if pred(elem) == v:
-                return elem
-        return None
-
-    converted = [
-        (attrget(attr.replace("__", ".")), value) for attr, value in attrs.items()
-    ]
-
-    for elem in iterable:
-        if all(pred(elem) == value for pred, value in converted):
-            return elem
-    return None
+# from typing import Any, Iterable, Optional, TypeVar, Union
 
 
 class Permissions:
@@ -75,7 +45,11 @@ class Permissions:
         mod_role = guild.get_role(model.mod_role)
         staff_role = guild.get_role(model.staff_role)
 
-        roles = {"adminrole": admin_role, "modrole": mod_role, "staffrole": staff_role}
+        roles = {
+            "adminrole": admin_role,
+            "modrole": mod_role,
+            "staffrole": staff_role,
+        }
         return roles
 
     async def staff_role_check(

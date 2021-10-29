@@ -1,11 +1,10 @@
-import asyncio
 from datetime import datetime
 
 import hikari
 import tanjun
 
 from itsnp.core.client import Client
-from itsnp.utils.time import *
+from itsnp.utils.time import pretty_datetime
 from models import WarningsModel
 
 from . import permissions, warning_count

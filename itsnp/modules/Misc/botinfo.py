@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from platform import python_version
 from time import time
 
@@ -10,7 +10,7 @@ from psutil import Process, virtual_memory
 from tanjun import __version__ as tanjun_version
 
 from itsnp.core.client import Client
-from itsnp.utils.time import *
+from itsnp.utils.time import pretty_timedelta
 
 botinfo_component = tanjun.Component()
 
@@ -50,14 +50,18 @@ async def botinfo_command(ctx: tanjun.abc.Context) -> None:
         ("CPU Time", pretty_cpu_time, True),
         ("Memory Usage", f"{mem_usage:,.0f} MiB /{mem_total:,.0f} MiB", True),
         ("Prefix", "/", True),
-        ("Total Guild Channels", len(ctx.cache.get_guild_channels_view()), True),
+        (
+            "Total Guild Channels",
+            len(ctx.cache.get_guild_channels_view()),
+            True,
+        ),
         (
             "Total Members",
             sum(len(record) for record in ctx.cache.get_members_view().values()),
             True,
         ),
         ("Total Guilds", len(ctx.cache.get_available_guilds_view()), True),
-        ("Owner <:crown:879222224438059049>", f"<@852617608309112882>", True),
+        ("Owner <:crown:879222224438059049>", "<@852617608309112882>", True),
     ]
     for name, value, inline in fields:
         embed.add_field(name=name, value=value, inline=inline)

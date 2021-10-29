@@ -26,7 +26,7 @@ async def resume(ctx: tanjun.abc.Context) -> None:
 
     if node.is_paused:
         await ctx.shards.data.lavalink.resume(ctx.guild_id)
-        embed = hikari.Embed(description=f"🎵 Resumed the Playback!", color=0x00FF00)
+        embed = hikari.Embed(description="🎵 Resumed the Playback!", color=0x00FF00)
         await ctx.respond(embed=embed)
     else:
         await ctx.respond("It's already resumed. 😡")

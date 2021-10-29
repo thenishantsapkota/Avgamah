@@ -1,5 +1,6 @@
 import re
 
+import hikari
 import tanjun
 
 URL_REGEX = re.compile(
@@ -58,3 +59,17 @@ async def _join(ctx: tanjun.abc.Context) -> int:
 
     await ctx.shards.data.lavalink.create_session(connection_info)
     return channel_id
+
+
+async def _leave(ctx: tanjun.abc.Context):
+    await ctx.shards.data.lavalink.destroy(ctx.guild_id)
+    await ctx.shards.data.lavalink.stop(ctx.guild_id)
+    await ctx.shards.data.lavalink.leave(ctx.guild_id)
+    await ctx.shards.data.lavalink.remove_guild_node(ctx.guild_id)
+    await ctx.shards.data.lavalink.remove_guild_from_loops(ctx.guild_id)
+
+    embed = hikari.Embed(
+        description="I left the voice channel!",
+        color=0xFF0000,
+    )
+    await ctx.respond(embed=embed)

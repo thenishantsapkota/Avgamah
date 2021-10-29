@@ -54,7 +54,6 @@ class SphinxObjectFileReader:
         # next line is "# Project: <name>"
         # then after that is "# Version: <version>"
         projname = self.readline().rstrip()[11:]
-        version = self.readline().rstrip()[11:]
 
         # next line says if it's a zlib header
         line = self.readline()

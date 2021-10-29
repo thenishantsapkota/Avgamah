@@ -8,8 +8,6 @@ from itsnp.core.client import Client
 from itsnp.utils.pagination import paginate
 from itsnp.utils.utilities import _chunk
 
-from . import check_voice_state
-
 lyrics_component = tanjun.Component()
 
 
@@ -28,7 +26,9 @@ async def lyrics(ctx: tanjun.abc.Context) -> None:
         return await ctx.respond("There's nothing playing at the moment!")
     song_name = node.now_playing.track.info.title
     async with aiohttp.request(
-        "GET", f"https://some-random-api.ml/lyrics?title={song_name}", headers={}
+        "GET",
+        f"https://some-random-api.ml/lyrics?title={song_name}",
+        headers={},
     ) as r:
         if not 200 <= r.status <= 299:
             raise tanjun.CommandError("No Lyrics found.")

@@ -1,4 +1,3 @@
-import asyncio
 from datetime import datetime
 
 import hikari
@@ -6,7 +5,6 @@ import tanjun
 
 from itsnp.core.client import Client
 from itsnp.utils.pagination import paginate
-from itsnp.utils.time import *
 from itsnp.utils.utilities import _chunk
 from models import WarningsModel
 

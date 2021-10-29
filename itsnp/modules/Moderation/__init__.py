@@ -5,7 +5,7 @@ import hikari
 import tanjun
 
 from itsnp.utils.permissions import Permissions
-from itsnp.utils.time import *
+from itsnp.utils.time import pretty_timedelta
 from models import MuteModel, WarningsModel
 
 permissions = Permissions()
@@ -58,7 +58,8 @@ async def mute_handler(
         embed.set_footer(text=f"Duration: {pretty_time}")
         embed.set_thumbnail(member.avatar_url)
         embed.set_author(
-            name=f"{ctx.member} [ ID {ctx.member.id}]", icon=ctx.member.avatar_url
+            name=f"{ctx.member} [ ID {ctx.member.id}]",
+            icon=ctx.member.avatar_url,
         )
 
         await log_channel.send(embed=embed)
@@ -105,7 +106,7 @@ async def unmute_handler(
     muted_role = await permissions.muted_role_check(ctx, guild)
     log_channel = await permissions.log_channel_check(ctx, guild)
     if muted_role.id not in member.role_ids:
-        return await ctx.respond(f"***User seems to be already unmuted!***")
+        return await ctx.respond("***User seems to be already unmuted!***")
 
     model = await MuteModel.get_or_none(guild_id=guild.id, member_id=member.id)
     role_ids = model.role_id

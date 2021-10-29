@@ -8,7 +8,9 @@ import yuyo
 
 
 async def paginate(
-    ctx: tanjun.abc.Context, fields: t.Generator[tuple | list], timeout: float | str
+    ctx: tanjun.abc.Context,
+    fields: t.Generator[tuple | list],
+    timeout: float | str,
 ):
     paginator = yuyo.ComponentPaginator(
         fields,
@@ -26,7 +28,10 @@ async def paginate(
     if first_response := await paginator.get_next_entry():
         content, embed = first_response
         message = await ctx.respond(
-            content=content, component=paginator, embed=embed, ensure_result=True
+            content=content,
+            component=paginator,
+            embed=embed,
+            ensure_result=True,
         )
-        ctx.shards.component_client.add_executor(message, paginator)
+        ctx.shards.component_client.set_executor(message, paginator)
         return

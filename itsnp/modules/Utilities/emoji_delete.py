@@ -1,10 +1,7 @@
-from datetime import datetime
-
 import hikari
 import tanjun
 
 from itsnp.core.client import Client
-from itsnp.utils.buttons import create_source_button
 
 from . import emoji_group, permissions
 

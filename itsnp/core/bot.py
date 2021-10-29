@@ -40,7 +40,7 @@ class Bot(hikari.GatewayBot):
     def create_client(self: _ITSNP) -> None:
         """Function that creates the tanjun client"""
         self.client = Client.from_gateway_bot(
-            self, declare_global_commands=TEST_GUILD_ID
+            self, declare_global_commands=TEST_GUILD_ID, mention_prefix=True
         )
         self.client.load_modules()
 
@@ -70,7 +70,7 @@ class Bot(hikari.GatewayBot):
         self.stdout_channel = await self.rest.fetch_channel(STDOUT_CHANNEL_ID)
         embed = hikari.Embed(
             title="Bot Starting!",
-            description=f"Testing Bot v{__version__} | Now Online",
+            description=f"{self.get_me().username} v{__version__} | Now Online",
             timestamp=datetime.now().astimezone(),
         )
         # await self.stdout_channel.send(embed=embed)
@@ -79,7 +79,7 @@ class Bot(hikari.GatewayBot):
     async def on_stopping(self: _ITSNP, event: hikari.StoppingEvent) -> None:
         embed = hikari.Embed(
             title="Bot Stopping!",
-            description=f"Testing Bot v{__version__} | Now Offline",
+            description=f"{self.get_me().username} v{__version__} | Now Offline",
             timestamp=datetime.now().astimezone(),
         )
         # await self.stdout_channel.send(embed=embed)
