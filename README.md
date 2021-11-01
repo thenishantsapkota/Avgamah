@@ -19,7 +19,6 @@ To invite this bot to your server, [click here](https://discord.com/api/oauth2/a
 
 First of all check `.env.example` for Examples on environment variables.
 
-To run this bot locally, you need to have a PostgreSQL database setup and running.
 
 Clone the repository using
 ```bash
@@ -27,27 +26,19 @@ git clone https://github.com/thenishantsapkota/Hikari-Bot
 poetry shell
 poetry install
 ```
-To use `poetry shell` you need to have [poetry](https://python-poetry.org/) installed on your path.
-That will initialize a virtual environment for the bot to work in.
 
-The `poetry install` command will install all the necessary requirements for the bot to run within the VirtualEnvironment.
+You need to have Docker Installed on your system.
 
-Before proceeding, Be sure to check `tortoise_config.py.example` to setup your `tortoise_config.py` accordingly.
-
-After sucessfully installing all the dependencies, do this when your PostgreSQL database is running.
-
+Afer cloning 
 ```bash
-aerich init -t tortoise_config.tortoise_config
-aerich init-db
+cd Avgamah
 ```
 
-This will initialize all the models and setup the database for your use.
-
-Then finally run this command to start the bot.
-
+Then run 
 ```bash
-python -OO -m itsnp
+docker-compose up --build # Linux users have to use sudo
 ```
 
+You're up and running!
 
 
