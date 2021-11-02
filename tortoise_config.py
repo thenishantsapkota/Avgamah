@@ -5,7 +5,7 @@ tortoise_config = {
             "engine": "tortoise.backends.asyncpg",
             "credentials": {
                 "database": "bot_db",
-                "host": "db",
+                "host": "db",  # db for docker
                 "password": "test123",
                 "port": 5432,
                 "user": "nishant",
