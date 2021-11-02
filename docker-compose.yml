@@ -19,12 +19,16 @@ services:
         depends_on:
             - db
             - lavalink
+            - redis
         links: 
             - db:postgres
             - lavalink:lavalink
-        command: ["./entrypoint.sh"]
-    
-    
+            - redis:redis
+    redis:
+          image: redis:alpine
+          restart: always
+          expose:
+            - 6379
     lavalink:
         image: samrid/ready-lavalink
     
