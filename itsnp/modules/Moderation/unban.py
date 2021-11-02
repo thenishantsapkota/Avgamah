@@ -4,6 +4,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 from . import permissions
 
@@ -37,7 +38,7 @@ async def unban_command(ctx: tanjun.abc.Context, user_id: int, reason: str) -> N
         name=f"{ctx.member} [ ID {ctx.member.id}]", icon=ctx.member.avatar_url
     )
     await log_channel.send(embed=embed)
-    await ctx.respond(f"🔓 ** Unbanned `{user}`**")
+    await ctx.respond(f"🔓 ** Unbanned `{user}`**", component=DELETE_ROW)
     try:
         await user.send(f"🔓 Unbanned from {guild.name}\n📄Reason: {reason}")
 

@@ -3,6 +3,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 truth_or_dare_component = tanjun.Component()
 
@@ -39,7 +40,7 @@ async def truth_or_dare(ctx: tanjun.abc.Context, type: str, category: str) -> No
         color=0x00FF00 if category == "friendly" else 0xFF0000,
     ).set_footer(f"Invoked by {ctx.author}")
 
-    await ctx.respond(embed=embed)
+    await ctx.respond(embed=embed, component=DELETE_ROW)
 
 
 @tanjun.as_loader

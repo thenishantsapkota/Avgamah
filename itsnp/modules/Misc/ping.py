@@ -4,6 +4,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 ping_component = tanjun.Component()
 
@@ -25,7 +26,7 @@ async def ping_command(ctx: tanjun.abc.Context) -> None:
         color=0xF1C40F,
     )
     embed.set_author(name="Ping")
-    await ctx.edit_last_response("", embed=embed)
+    await ctx.edit_last_response("", embed=embed, component=DELETE_ROW)
 
 
 @tanjun.as_loader

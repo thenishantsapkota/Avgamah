@@ -4,6 +4,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 serverinfo_component = tanjun.Component()
 
@@ -56,7 +57,7 @@ async def serverinfo_command(ctx: tanjun.abc.Context) -> None:
             ),
         )
 
-    await ctx.respond(embed=embed)
+    await ctx.respond(embed=embed, component=DELETE_ROW)
 
 
 @tanjun.as_loader

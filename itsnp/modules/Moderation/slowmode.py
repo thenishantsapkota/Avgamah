@@ -5,6 +5,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 from itsnp.utils.time import TimeConverter, pretty_timedelta
 
 slowmode_component = tanjun.Component()
@@ -42,7 +43,7 @@ async def slowmode(
     )
     embed.set_footer(text=f"Invoked by {ctx.author}")
 
-    await ctx.respond(embed=embed)
+    await ctx.respond(embed=embed, component=DELETE_ROW)
 
 
 @tanjun.as_loader

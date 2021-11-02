@@ -6,7 +6,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
-from itsnp.utils.buttons import create_source_button
+from itsnp.utils.buttons import DELETE_ROW, create_source_button
 
 weather_component = tanjun.Component()
 
@@ -61,7 +61,7 @@ async def weather_command(ctx: tanjun.abc.Context, *, city: str) -> None:
     embed.set_thumbnail(image)
 
     button = create_source_button(ctx, "https://openweathermap.org/api")
-    await ctx.respond(embed=embed, component=button)
+    await ctx.respond(embed=embed, components=[button, DELETE_ROW])
 
 
 @tanjun.as_loader

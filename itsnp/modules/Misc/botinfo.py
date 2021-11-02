@@ -10,6 +10,7 @@ from psutil import Process, virtual_memory
 from tanjun import __version__ as tanjun_version
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 from itsnp.utils.time import pretty_timedelta
 
 botinfo_component = tanjun.Component()
@@ -82,7 +83,7 @@ async def botinfo_command(ctx: tanjun.abc.Context) -> None:
         .add_to_container()
     )
 
-    await ctx.respond(embed=embed, component=button)
+    await ctx.respond(embed=embed, components=[button, DELETE_ROW])
 
 
 @tanjun.as_loader

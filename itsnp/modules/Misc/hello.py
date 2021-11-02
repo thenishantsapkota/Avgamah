@@ -4,6 +4,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 hello_component = tanjun.Component()
 
@@ -17,7 +18,9 @@ hello_component = tanjun.Component()
 @tanjun.as_slash_command("hello", "Greet the user with hello.")
 async def hello_command(ctx: tanjun.abc.Context) -> None:
     greeting = random.choice(("Hello", "Hi", "Hey"))
-    await ctx.respond(f"{greeting} {ctx.member.mention}!", user_mentions=True)
+    await ctx.respond(
+        f"{greeting} {ctx.member.mention}!", user_mentions=True, component=DELETE_ROW
+    )
 
 
 @tanjun.as_loader

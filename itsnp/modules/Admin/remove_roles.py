@@ -4,6 +4,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 from . import permissions, role_group
 
@@ -34,7 +35,7 @@ async def take_role_command(
     )
     embed.add_field(name="Removed Role", value=f"{role.mention}")
     embed.set_author(name=f"{author} [ {author.id} ]", icon=author.avatar_url)
-    await ctx.respond(embed=embed)
+    await ctx.respond(embed=embed, component=DELETE_ROW)
 
 
 @tanjun.as_loader

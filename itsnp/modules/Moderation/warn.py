@@ -4,6 +4,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 from itsnp.utils.time import pretty_datetime
 from models import WarningsModel
 
@@ -46,7 +47,7 @@ async def warn_command(
     embed.set_thumbnail(member.avatar_url)
     embed.set_author(name=f"{author} [ ID {author.id}]", icon=author.avatar_url)
     await log_channel.send(embed=embed)
-    await ctx.respond(f"⚠️ ** Warned `{member}`**")
+    await ctx.respond(f"⚠️ ** Warned `{member}`**", component=DELETE_ROW)
     try:
         await member.send(f"⚠️ Warned in {guild.name}\n📄Reason: {reason}")
 

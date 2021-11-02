@@ -4,6 +4,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 from models import MemberJoinModel
 
 from . import permissions
@@ -40,7 +41,7 @@ async def set_welcome_channel(
         color=0x00FF00,
     )
     embed.set_thumbnail(ctx.get_guild().icon_url)
-    await ctx.respond(embed=embed)
+    await ctx.respond(embed=embed, component=DELETE_ROW)
 
 
 @tanjun.as_loader

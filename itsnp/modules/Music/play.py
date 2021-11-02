@@ -3,6 +3,7 @@ import lavasnek_rs
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 from . import URL_REGEX, _join
 
@@ -27,7 +28,9 @@ async def play(ctx: tanjun.abc.Context, query: str) -> None:
     query_information = await ctx.shards.data.lavalink.auto_search_tracks(query)
 
     if not query_information.tracks:
-        return await ctx.respond("I could not find any songs according to the query!")
+        return await ctx.respond(
+            "I could not find any songs according to the query!", component=DELETE_ROW
+        )
 
     try:
         if not URL_REGEX.match(query):
@@ -54,7 +57,7 @@ async def play(ctx: tanjun.abc.Context, query: str) -> None:
         description=f"[{query_information.tracks[0].info.title}]({query_information.tracks[0].info.uri})",
         color=0x00FF00,
     )
-    await ctx.respond(embed=embed)
+    await ctx.respond(embed=embed, component=DELETE_ROW)
 
 
 @tanjun.as_loader

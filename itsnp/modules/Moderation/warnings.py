@@ -4,6 +4,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 from itsnp.utils.pagination import paginate
 from itsnp.utils.utilities import _chunk
 from models import WarningsModel
@@ -31,7 +32,7 @@ async def warnings_list(ctx: tanjun.abc.Context, member: hikari.Member) -> None:
     warn_model = await WarningsModel.filter(guild_id=guild.id, member_id=member.id)
 
     if not len(warn_model):
-        return await ctx.respond("User hasn't been warned!")
+        return await ctx.respond("User hasn't been warned!", component=DELETE_ROW)
 
     warnings = [
         f"#{model.id} - `{model.date}` - Warned By **{model.author_name}**\n**Reason:**{model.reason}"
@@ -71,7 +72,7 @@ async def warnings_delete(
     log_channel = await permissions.log_channel_check(ctx, ctx.get_guild())
     model = await WarningsModel.get_or_none(guild_id=ctx.guild_id, id=id)
     if model is None:
-        return await ctx.respond("Warning ID doesn't exist!")
+        return await ctx.respond("Warning ID doesn't exist!", component=DELETE_ROW)
     await model.delete()
     await ctx.respond(f"Deleted Warning #{id} of **{member}**")
     embed = hikari.Embed(
@@ -107,7 +108,7 @@ async def warnings_clear(ctx: tanjun.abc.Context, member: hikari.Member) -> None
     )
     embed.set_author(name=f"{author} [ID {author.id}]", icon=author.avatar_url)
     embed.set_thumbnail(member.avatar_url)
-    await log_channel.send(embed=embed)
+    await log_channel.send(embed=embed, component=DELETE_ROW)
 
 
 warnings_component.add_slash_command(warnings_group)

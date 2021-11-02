@@ -2,6 +2,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 from . import check_voice_state
 
@@ -35,7 +36,7 @@ async def removesong(ctx: tanjun.abc.Context, index: int) -> None:
     embed = hikari.Embed(
         title=f"Removed `{song_to_be_removed.track.info.title}` from the queue."
     )
-    await ctx.respond(embed=embed)
+    await ctx.respond(embed=embed, component=DELETE_ROW)
 
 
 @tanjun.as_loader

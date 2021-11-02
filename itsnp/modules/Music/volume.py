@@ -2,6 +2,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 from . import check_voice_state
 
@@ -23,16 +24,18 @@ async def volume(ctx: tanjun.abc.Context, volume: int) -> None:
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
 
     if not node or not node.now_playing:
-        return await ctx.respond("Nothing is being played at the moment")
+        return await ctx.respond(
+            "Nothing is being played at the moment", component=DELETE_ROW
+        )
 
     if 0 < volume <= 100:
         await ctx.shards.data.lavalink.volume(ctx.guild_id, volume)
         embed = hikari.Embed(
             description=f"⏯️ Set the Volume to {volume}", color=0x00FF00
         )
-        await ctx.respond(embed=embed)
+        await ctx.respond(embed=embed, component=DELETE_ROW)
     else:
-        await ctx.respond("Volume should be between 0 and 100")
+        await ctx.respond("Volume should be between 0 and 100", component=DELETE_ROW)
 
 
 @tanjun.as_loader

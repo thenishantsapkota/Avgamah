@@ -2,6 +2,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 from . import check_voice_state
 
@@ -34,7 +35,7 @@ async def skip(ctx: tanjun.abc.Context) -> None:
         description=f"[{skip.track.info.title}]({skip.track.info.uri})",
     )
 
-    await ctx.respond(embed=em)
+    await ctx.respond(embed=em, component=DELETE_ROW)
 
 
 @tanjun.as_loader

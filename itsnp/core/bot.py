@@ -1,23 +1,22 @@
 import asyncio
 import logging
-import os
 import typing as t
-from datetime import datetime
 
+import aioredis
 import hikari
 import lavasnek_rs
 import yuyo
-from dotenv import load_dotenv
 from tortoise import Tortoise
 
-from itsnp import STDOUT_CHANNEL_ID, TEST_GUILD_ID, __version__
+from config import bot_config, lavalink_config
+from itsnp import TEST_GUILD_ID, __version__
 from itsnp.utils.activity import CustomActivity
+from itsnp.utils.buttons import DELETE_CUSTOM_ID, delete_message_button
+from itsnp.utils.cache import CacheRedditPosts
 from tortoise_config import tortoise_config
 
 from .client import Client
 from .event_handler import EventHandler
-
-load_dotenv()
 
 _ITSNP = t.TypeVar("_ITSNP", bound="Bot")
 
@@ -33,9 +32,13 @@ class Bot(hikari.GatewayBot):
     """Custom class that initiates Hikari's GatewayBot"""
 
     def __init__(self) -> None:
-        super().__init__(token=os.environ.get("BOT_TOKEN"), intents=hikari.Intents.ALL)
+        super().__init__(token=bot_config.token, intents=hikari.Intents.ALL)
         self.data = Data()
-        self.component_client = yuyo.ComponentClient.from_gateway_bot(self)
+        self.redis = aioredis.from_url(url="redis://redis")
+        self.reddit_cache = CacheRedditPosts(self)
+        self.component_client = yuyo.ComponentClient.from_gateway_bot(
+            self
+        ).set_constant_id(DELETE_CUSTOM_ID, delete_message_button)
 
     def create_client(self: _ITSNP) -> None:
         """Function that creates the tanjun client"""
@@ -51,7 +54,6 @@ class Bot(hikari.GatewayBot):
         self.event_manager.subscribe(hikari.StartingEvent, self.on_starting)
         self.event_manager.subscribe(hikari.StartedEvent, self.on_started)
         self.event_manager.subscribe(hikari.StoppingEvent, self.on_stopping)
-        self.event_manager.subscribe(hikari.ShardReadyEvent, self.on_shard_ready)
 
         super().run()
 
@@ -67,32 +69,18 @@ class Bot(hikari.GatewayBot):
 
     async def on_started(self: _ITSNP, event: hikari.StartedEvent) -> None:
         asyncio.create_task(CustomActivity(self).change_status())
-        self.stdout_channel = await self.rest.fetch_channel(STDOUT_CHANNEL_ID)
-        embed = hikari.Embed(
-            title="Bot Starting!",
-            description=f"{self.get_me().username} v{__version__} | Now Online",
-            timestamp=datetime.now().astimezone(),
-        )
-        # await self.stdout_channel.send(embed=embed)
-        logger.info("Bot is ready!")
-
-    async def on_stopping(self: _ITSNP, event: hikari.StoppingEvent) -> None:
-        embed = hikari.Embed(
-            title="Bot Stopping!",
-            description=f"{self.get_me().username} v{__version__} | Now Offline",
-            timestamp=datetime.now().astimezone(),
-        )
-        # await self.stdout_channel.send(embed=embed)
-        self.component_client.close()
-        logger.info("Bot has stopped.")
-
-    async def on_shard_ready(self, event: hikari.ShardReadyEvent) -> None:
+        asyncio.create_task(CacheRedditPosts(self).fetch_posts())
         builder = (
-            lavasnek_rs.LavalinkBuilder(self.get_me().id, os.environ.get("BOT_TOKEN"))
-            .set_host("lavalink")
-            .set_password(os.environ.get("LAVALINK_PASSWORD"))
+            lavasnek_rs.LavalinkBuilder(self.get_me().id, bot_config.token)
+            .set_host("lavalink")  # lavalink for docker else 127.0.0.1
+            .set_password(lavalink_config.password)
         )
 
         event_handler = EventHandler(self)
         lava_client = await builder.build(event_handler)
         self.data.lavalink = lava_client
+        logger.info("Bot is ready!")
+
+    async def on_stopping(self: _ITSNP, event: hikari.StoppingEvent) -> None:
+        self.component_client.close()
+        logger.info("Bot has stopped.")

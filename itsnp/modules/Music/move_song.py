@@ -2,6 +2,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 from . import check_voice_state
 
@@ -38,7 +39,7 @@ async def movesong(ctx: tanjun.abc.Context, old_index: int, new_index: int) -> N
         title=f"Moved `{song_to_be_moved.track.info.title}` to Position `{new_index}`",
         color=0x00FF00,
     )
-    await ctx.respond(embed=embed)
+    await ctx.respond(embed=embed, component=DELETE_ROW)
 
 
 @tanjun.as_loader

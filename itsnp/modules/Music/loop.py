@@ -1,6 +1,8 @@
 import tanjun
+from yuyo.components import ComponentExecutor
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 from . import check_voice_state
 
@@ -29,12 +31,12 @@ async def loop(ctx: tanjun.abc.Context, choice: str) -> None:
         queue.insert(1, now_playing)
         node.queue = queue
         await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
-        await ctx.respond("Looping the currently playing track.")
+        await ctx.respond("Looping the currently playing track.", component=DELETE_ROW)
     elif choice == "queue":
         queue.extend(queue)
         node.queue = queue
         await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
-        await ctx.respond("Looping the queue again.")
+        await ctx.respond("Looping the queue again.", component=DELETE_ROW)
 
 
 @tanjun.as_loader

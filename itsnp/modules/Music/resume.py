@@ -2,6 +2,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 from . import check_voice_state
 
@@ -22,14 +23,16 @@ async def resume(ctx: tanjun.abc.Context) -> None:
     node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
 
     if not node or not node.now_playing:
-        return await ctx.respond("No tracks are currently playing!")
+        return await ctx.respond(
+            "No tracks are currently playing!", component=DELETE_ROW
+        )
 
     if node.is_paused:
         await ctx.shards.data.lavalink.resume(ctx.guild_id)
         embed = hikari.Embed(description="🎵 Resumed the Playback!", color=0x00FF00)
-        await ctx.respond(embed=embed)
+        await ctx.respond(embed=embed, component=DELETE_ROW)
     else:
-        await ctx.respond("It's already resumed. 😡")
+        await ctx.respond("It's already resumed. 😡", component=DELETE_ROW)
 
 
 @tanjun.as_loader

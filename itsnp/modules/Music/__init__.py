@@ -3,6 +3,8 @@ import re
 import hikari
 import tanjun
 
+from itsnp.utils.buttons import DELETE_ROW
+
 URL_REGEX = re.compile(
     r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
 )
@@ -47,7 +49,9 @@ async def _join(ctx: tanjun.abc.Context) -> int:
     voice_state = list(filter(lambda i: i.user_id == ctx.author.id, states.iterator()))
 
     if not voice_state:
-        return await ctx.respond("Connect to a voice channel to continue!")
+        return await ctx.respond(
+            "Connect to a voice channel to continue!", component=DELETE_ROW
+        )
 
     channel_id = voice_state[0].channel_id
 
@@ -55,7 +59,9 @@ async def _join(ctx: tanjun.abc.Context) -> int:
         connection_info = await ctx.shards.data.lavalink.join(ctx.guild_id, channel_id)
 
     except TimeoutError:
-        return await ctx.respond("I cannot connect to your voice channel!")
+        return await ctx.respond(
+            "I cannot connect to your voice channel!", component=DELETE_ROW
+        )
 
     await ctx.shards.data.lavalink.create_session(connection_info)
     return channel_id
@@ -72,4 +78,4 @@ async def _leave(ctx: tanjun.abc.Context):
         description="I left the voice channel!",
         color=0xFF0000,
     )
-    await ctx.respond(embed=embed)
+    await ctx.respond(embed=embed, component=DELETE_ROW)

@@ -4,6 +4,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 from . import check_voice_state
 
@@ -34,7 +35,7 @@ async def shuffle(ctx: tanjun.abc.Context) -> None:
     await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
 
     embed = hikari.Embed(title="🔀 Shuffled Queue", color=0x00FF00)
-    await ctx.respond(embed=embed)
+    await ctx.respond(embed=embed, component=DELETE_ROW)
 
 
 @tanjun.as_loader

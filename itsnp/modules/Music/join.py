@@ -2,6 +2,7 @@ import hikari
 import tanjun
 
 from itsnp.core.client import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 from . import _join
 
@@ -22,7 +23,7 @@ async def join(ctx: tanjun.abc.Context) -> None:
 
     if channel_id:
         embed = hikari.Embed(description=f"Joined <#{channel_id}>", color=0x00FF00)
-        await ctx.respond(embed=embed)
+        await ctx.respond(embed=embed, component=DELETE_ROW)
 
 
 @tanjun.as_loader
