@@ -14,7 +14,7 @@ tortoise-orm = "0.17.4"
 asyncpg = "^0.24.0"
 hikari = {git = "https://github.com/hikari-py/hikari"}
 hikari-tanjun = {git = "https://github.com/FasterSpeeding/Tanjun"}
-APScheduler = "^3.8.0"
+APScheduler = "^3.8.1"
 bs4 = "^0.0.1"
 psutil = "^5.8.0"
 hikari-yuyo = {git= "https://github.com/FasterSpeeding/Yuyo"}
