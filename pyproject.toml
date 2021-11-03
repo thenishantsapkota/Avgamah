@@ -26,7 +26,7 @@ asyncpraw = "^7.4.0"
 
 [tool.poetry.dev-dependencies]
 black = "^21.10b0"
-isort = "^5.9.3"
+isort = "^5.10.0"
 pre-commit = "^2.15.0"
 flake8 = "^4.0.1"
 
