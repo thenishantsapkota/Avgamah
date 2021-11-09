@@ -505,7 +505,7 @@ python-versions = "*"
 
 [[package]]
 name = "isort"
-version = "5.10.0"
+version = "5.10.1"
 description = "A Python utility / library to sort Python imports."
 category = "dev"
 optional = false
@@ -872,7 +872,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.11"
-content-hash = "46b92757c050a837baa878fbbfd305617166111dfc560e0661f155ebbb71dc42"
+content-hash = "87df500907d13ac60d89380b9d9af19afec489b6693f4cee49155674f90a7a2d"
 
 [metadata.files]
 aerich = [
@@ -1056,8 +1056,8 @@ iso8601 = [
     {file = "iso8601-0.1.16.tar.gz", hash = "sha256:36532f77cc800594e8f16641edae7f1baf7932f05d8e508545b95fc53c6dc85b"},
 ]
 isort = [
-    {file = "isort-5.10.0-py3-none-any.whl", hash = "sha256:1a18ccace2ed8910bd9458b74a3ecbafd7b2f581301b0ab65cfdd4338272d76f"},
-    {file = "isort-5.10.0.tar.gz", hash = "sha256:e52ff6d38012b131628cf0f26c51e7bd3a7c81592eefe3ac71411e692f1b9345"},
+    {file = "isort-5.10.1-py3-none-any.whl", hash = "sha256:6f62d78e2f89b4500b080fe3a81690850cd254227f27f75c3a0c491a1f351ba7"},
+    {file = "isort-5.10.1.tar.gz", hash = "sha256:e8443a5e7a020e9d7f97f1d7d9cd17c88bcb3bc7e218bf9cf5095fe550be2951"},
 ]
 lavasnek-rs = [
     {file = "lavasnek_rs-0.1.0_alpha.1-cp310-cp310-macosx_10_7_x86_64.whl", hash = "sha256:c6103cf2b3f581653d7ff4d6b46046847c8fe3d4059c872cba7d84ee6261d39d"},
