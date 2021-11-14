@@ -1,36 +1,33 @@
 version: "3"
 
 services:
-    db:
-      image: postgres:13
-      restart: always
-      expose:
-        - 5432
-      environment:
-        POSTGRES_USER: nishant
-        POSTGRES_PASSWORD: test123
-        POSTGRES_DB: bot_db
-      volumes:
-        - postgres-data:/var/lib/postgresql/data
+  db:
+    image: postgres:latest
+    restart: always
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    env_file: .env
 
-    bot:
-        build: .
-        env_file: .env
-        depends_on:
-            - db
-            - lavalink
-            - redis
-        links: 
-            - db:postgres
-            - lavalink:lavalink
-            - redis:redis
-    redis:
-          image: redis:alpine
-          restart: always
-          expose:
-            - 6379
-    lavalink:
-        image: samrid/ready-lavalink
-    
+  bot:
+    build: .
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+      - lavalink
+    links:
+      - db:postgres
+      - redis:redis
+      - lavalink:lavalink
+    volumes:
+      - ./:/code
+
+  redis:
+    image: redis:alpine
+    restart: always
+
+  lavalink:
+    image: samrid/ready-lavalink
+
 volumes:
-    postgres-data:
+  postgres-data:
