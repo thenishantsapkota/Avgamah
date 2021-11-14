@@ -5,6 +5,7 @@ import typing as t
 import aioredis
 import hikari
 import lavasnek_rs
+import tanjun
 import yuyo
 from tortoise import Tortoise
 
@@ -37,7 +38,7 @@ class Bot(hikari.GatewayBot):
         self.redis = aioredis.from_url(url="redis://redis")
         self.reddit_cache = CacheRedditPosts(self)
         self.component_client = yuyo.ComponentClient.from_gateway_bot(
-            self
+            self, event_managed=False
         ).set_constant_id(DELETE_CUSTOM_ID, delete_message_button)
 
     def create_client(self: _ITSNP) -> None:
@@ -45,6 +46,14 @@ class Bot(hikari.GatewayBot):
         self.client = Client.from_gateway_bot(
             self, declare_global_commands=TEST_GUILD_ID, mention_prefix=True
         )
+        (
+            self.client.add_client_callback(
+                tanjun.ClientCallbackNames.STARTING, self.component_client.open
+            ).add_client_callback(
+                tanjun.ClientCallbackNames.CLOSING, self.component_client.close
+            )
+        )
+        self.client.set_type_dependency(yuyo.ComponentClient, self.component_client)
         self.client.load_modules()
 
     def run(self: _ITSNP) -> None:
@@ -62,12 +71,11 @@ class Bot(hikari.GatewayBot):
         await Tortoise.init(tortoise_config)
         logger.info("Connected to Database.")
 
-    async def on_starting(self: _ITSNP, event: hikari.StartingEvent) -> None:
-        self.component_client.open()
+    async def on_starting(self: _ITSNP, _: hikari.StartingEvent) -> None:
         logger.info("No Cache yet!")
         asyncio.create_task(self.connect_db())
 
-    async def on_started(self: _ITSNP, event: hikari.StartedEvent) -> None:
+    async def on_started(self: _ITSNP, _: hikari.StartedEvent) -> None:
         asyncio.create_task(CustomActivity(self).change_status())
         asyncio.create_task(CacheRedditPosts(self).fetch_posts())
         builder = (
@@ -81,6 +89,5 @@ class Bot(hikari.GatewayBot):
         self.data.lavalink = lava_client
         logger.info("Bot is ready!")
 
-    async def on_stopping(self: _ITSNP, event: hikari.StoppingEvent) -> None:
-        self.component_client.close()
+    async def on_stopping(self: _ITSNP, _: hikari.StoppingEvent) -> None:
         logger.info("Bot has stopped.")
