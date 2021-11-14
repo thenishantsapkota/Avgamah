@@ -1,12 +1,8 @@
-from datetime import timedelta
-
 import hikari
 import tanjun
-from StringProgressBar import progressBar
 
 from itsnp.core.client import Client
 from itsnp.utils.buttons import DELETE_ROW
-from itsnp.utils.time import pretty_timedelta_shortened
 
 now_playing_component = tanjun.Component()
 
@@ -28,20 +24,6 @@ async def now_playing(ctx: tanjun.abc.Context) -> None:
             "There's nothing playing at the moment!", component=DELETE_ROW
         )
 
-    song_length = pretty_timedelta_shortened(
-        timedelta(seconds=float(node.now_playing.track.info.length) / 1000)
-    )
-
-    current_position = pretty_timedelta_shortened(
-        timedelta(seconds=float(node.now_playing.track.info.position) / 1000)
-    )
-
-    progress_bar = progressBar.createBoxDiscord(
-        node.now_playing.track.info.position,
-        node.now_playing.track.info.length,
-        15,
-    )
-
     embed = hikari.Embed(
         title="Now Playing",
         description=f"[{node.now_playing.track.info.title}]({node.now_playing.track.info.uri})",
@@ -50,11 +32,6 @@ async def now_playing(ctx: tanjun.abc.Context) -> None:
     fields = [
         ("Requested by", f"<@{node.now_playing.requester}>", True),
         ("Author", node.now_playing.track.info.author, True),
-        (
-            "Progress",
-            f"{progress_bar}\n**{current_position if current_position else '0s'} / {song_length}**",
-            False,
-        ),
     ]
     for name, value, inline in fields:
         embed.add_field(name=name, value=value, inline=inline)
