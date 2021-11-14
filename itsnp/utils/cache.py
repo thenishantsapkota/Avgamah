@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class CacheRedditPosts:
     def __init__(self, bot: "Bot") -> None:
         self.bot = bot
-        self.subreddits = ["memes", "cursedcomments"]
+        self.subreddits = ["memes", "cursedcomments", "boobs", "hentai"]
         self.reddit = asyncpraw.Reddit(
             client_id=reddit_config.client_id,
             client_secret=reddit_config.client_secret,
