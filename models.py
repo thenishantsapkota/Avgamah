@@ -104,11 +104,11 @@ class MemberJoinModel(Model):
         table_description = "Stores the Welcome channel and Welcome Message of the bot."
 
 
-class JoinToCreate(Model):
-    id = fields.IntField(pk=True)
-    member_id = fields.BigIntField(null=True)
-    channel_id = fields.BigIntField(null=True)
+class ColorModel(Model):
+    guild_id = fields.BigIntField(null=True)
+    role_id = fields.BigIntField(null=True)
+    role_name = fields.TextField(null=True)
 
     class Meta:
-        table = "voice_channels"
-        table_description = "Stores info about voice channels created."
+        table = "colors"
+        table_description = "Stores role info for the guild"
