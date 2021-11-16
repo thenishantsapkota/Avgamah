@@ -7,7 +7,7 @@ permissions = Permissions()
 emoji_group = tanjun.slash_command_group("emoji", "Group that handles emoji operations")
 
 color_dict: dict[str, int] = {
-    "Crimson": 0xDC143C,
+    "Crimson": 0x990000,
     "Green": 0x00FF00,
     "Yellow": 0xFFFF00,
     "Cyan": 0x00FFFF,
