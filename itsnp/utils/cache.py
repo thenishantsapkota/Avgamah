@@ -9,6 +9,7 @@ import hikari
 import tanjun
 
 from config import reddit_config
+from itsnp.utils.buttons import DELETE_ROW
 
 if TYPE_CHECKING:
     from itsnp.core import Bot
@@ -17,7 +18,15 @@ if TYPE_CHECKING:
 class CacheRedditPosts:
     def __init__(self, bot: "Bot") -> None:
         self.bot = bot
-        self.subreddits = ["memes", "cursedcomments", "boobs", "hentai"]
+        self.subreddits = [
+            "memes",
+            "cursedcomments",
+            "boobs",
+            "hentai",
+            "ass",
+            "Nudes",
+            "pussy",
+        ]
         self.reddit = asyncpraw.Reddit(
             client_id=reddit_config.client_id,
             client_secret=reddit_config.client_secret,
@@ -78,11 +87,11 @@ class CacheRedditPosts:
             description="**[{}](https://new.reddit.com{})**".format(
                 submission.get("title"), submission.get("permalink")
             ),
-            color=0x00FF00,
+            color=0x99CCFF,
         )
         embed.set_image(submission.get("url"))
         embed.set_footer(text=f"Requested by {ctx.author}")
-        await ctx.respond(embed=embed)
+        await ctx.respond(embed=embed, component=DELETE_ROW)
 
     async def fetch_posts(self) -> None:
         while True:
