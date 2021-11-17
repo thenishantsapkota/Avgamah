@@ -11,7 +11,7 @@ python-dotenv = "^0.19.2"
 aiohttp = "^3.7.4"
 aerich = "0.5.3"
 tortoise-orm = "0.17.4"
-asyncpg = "^0.24.0"
+asyncpg = "^0.25.0"
 hikari = {git = "https://github.com/hikari-py/hikari"}
 hikari-tanjun = {git = "https://github.com/FasterSpeeding/Tanjun"}
 APScheduler = "^3.8.1"
