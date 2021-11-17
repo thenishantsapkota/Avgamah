@@ -69,7 +69,7 @@ async def botinfo_command(ctx: tanjun.abc.Context) -> None:
 
     button = (
         ctx.rest.build_action_row()
-        .add_button(ButtonStyle.LINK, "https://discord.gg/5Tf468hhJy")
+        .add_button(ButtonStyle.LINK, "https://discord.gg/remVxztXYs")
         .set_label("Support Server")
         .add_to_container()
         .add_button(ButtonStyle.LINK, "https://github.com/thenishantsapkota/Hikari-Bot")
