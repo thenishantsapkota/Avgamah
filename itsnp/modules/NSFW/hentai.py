@@ -9,6 +9,11 @@ hentai_component = tanjun.Component()
 
 
 @hentai_component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.with_nsfw_check
 @tanjun.as_slash_command("hentai", "Get some juicy hentai...Yum!!")
 async def hentai(ctx: tanjun.abc.Context):

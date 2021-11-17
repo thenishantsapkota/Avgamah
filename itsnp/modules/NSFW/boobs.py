@@ -1,3 +1,4 @@
+import hikari
 import tanjun
 
 from itsnp.core.client import Client
@@ -6,6 +7,11 @@ boobs_component = tanjun.Component()
 
 
 @boobs_component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.SEND_MESSAGES
+    | hikari.Permissions.VIEW_CHANNEL
+    | hikari.Permissions.EMBED_LINKS
+)
 @tanjun.with_nsfw_check
 @tanjun.as_slash_command("boobs", "Boobies")
 async def boobs(ctx: tanjun.abc.Context):
