@@ -2,6 +2,7 @@ import hikari
 import tanjun
 
 from itsnp.core import Client
+from itsnp.utils.buttons import DELETE_ROW
 
 from . import fetch_lavalink
 
@@ -31,7 +32,8 @@ async def clear_queue(ctx: tanjun.abc.Context) -> None:
         embed=hikari.Embed(
             description="Cleared the queue. :ok_hand:",
             color=0x00FF00,
-        )
+        ),
+        component=DELETE_ROW,
     )
 
 
