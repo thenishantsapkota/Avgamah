@@ -13,7 +13,7 @@ from . import color_dict, permissions
 color_component = tanjun.Component()
 
 COLOR_MENU = {
-    "Crimson": {"title": "Crimson", "style": hikari.ButtonStyle.PRIMARY, "emoji": ""},
+    "Crimson": {"title": "Crimson", "style": hikari.ButtonStyle.PRIMARY},
     "Green": {"title": "Green", "style": hikari.ButtonStyle.PRIMARY},
     "Yellow": {"title": "Yellow", "style": hikari.ButtonStyle.PRIMARY},
     "Cyan": {"title": "Cyan", "style": hikari.ButtonStyle.PRIMARY},
@@ -68,7 +68,8 @@ async def colors(ctx: tanjun.abc.Context) -> None:
         "https://cdn.discordapp.com/attachments/853175466751295499/910075028803055626/unknown.png"
     )
 
-    await ctx.respond(embed=embed, components=[*menu])
+    await ctx.get_channel().send(embed=embed, components=[*menu])
+    await ctx.respond("Done, You can now delete this message.")
 
 
 @color_component.with_listener(hikari.InteractionCreateEvent)
