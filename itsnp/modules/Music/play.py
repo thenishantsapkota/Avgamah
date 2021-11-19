@@ -43,14 +43,14 @@ async def play(ctx: tanjun.abc.Context, query: str) -> None:
             await lavalink.play(ctx.guild_id, query_information.tracks[0]).requester(
                 ctx.author.id
             ).queue()
-            node = await lavalink.get_guild_node(ctx.guild_id)
         else:
             for track in query_information.tracks:
                 length += track.info.length
                 await lavalink.play(ctx.guild_id, track).requester(
                     ctx.author.id
                 ).queue()
-            node = await lavalink.get_guild_node(ctx.guild_id)
+
+        node = await lavalink.get_guild_node(ctx.guild_id)
 
         if not node:
             pass
