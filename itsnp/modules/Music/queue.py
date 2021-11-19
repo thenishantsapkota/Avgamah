@@ -1,10 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import hikari
 import tanjun
 
 from itsnp.core.client import Client
 from itsnp.utils.pagination import paginate
+from itsnp.utils.time import pretty_timedelta_shortened
 from itsnp.utils.utilities import _chunk
 
 queue_component = tanjun.Component()
@@ -28,7 +29,7 @@ async def queue(ctx: tanjun.abc.Context) -> None:
 
     for song in node.queue:
         song_queue += [
-            f"[{song.track.info.title}]({song.track.info.uri}) [<@{song.requester}>]"
+            f"`{pretty_timedelta_shortened(timedelta(seconds=song.track.info.length))}` [{song.track.info.title}]({song.track.info.uri}) [<@{song.requester}>]"
         ]
 
     fields = []
