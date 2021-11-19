@@ -1,11 +1,15 @@
+from datetime import timedelta
+
 import hikari
 import lavasnek_rs
 import tanjun
+from hikari.files import URL
 
 from itsnp.core.client import Client
 from itsnp.utils.buttons import DELETE_ROW
+from itsnp.utils.time import pretty_timedelta
 
-from . import URL_REGEX, _join
+from . import URL_REGEX, _join, fetch_lavalink
 
 play_component = tanjun.Component()
 
@@ -21,11 +25,13 @@ play_component = tanjun.Component()
 @tanjun.with_str_slash_option("query", "Name of the song or URL")
 @tanjun.as_slash_command("play", "Play a song")
 async def play(ctx: tanjun.abc.Context, query: str) -> None:
-    con = await ctx.shards.data.lavalink.get_guild_gateway_connection_info(ctx.guild_id)
+    length = 0
+    lavalink = fetch_lavalink(ctx)
+    con = await lavalink.get_guild_gateway_connection_info(ctx.guild_id)
 
     if not con:
         await _join(ctx)
-    query_information = await ctx.shards.data.lavalink.auto_search_tracks(query)
+    query_information = await lavalink.auto_search_tracks(query)
 
     if not query_information.tracks:
         return await ctx.respond(
@@ -34,16 +40,17 @@ async def play(ctx: tanjun.abc.Context, query: str) -> None:
 
     try:
         if not URL_REGEX.match(query):
-            await ctx.shards.data.lavalink.play(
-                ctx.guild_id, query_information.tracks[0]
-            ).requester(ctx.author.id).queue()
-            node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+            await lavalink.play(ctx.guild_id, query_information.tracks[0]).requester(
+                ctx.author.id
+            ).queue()
+            node = await lavalink.get_guild_node(ctx.guild_id)
         else:
             for track in query_information.tracks:
-                await ctx.shards.data.lavalink.play(ctx.guild_id, track).requester(
+                length += track.info.length
+                await lavalink.play(ctx.guild_id, track).requester(
                     ctx.author.id
                 ).queue()
-            node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+            node = await lavalink.get_guild_node(ctx.guild_id)
 
         if not node:
             pass
@@ -52,11 +59,26 @@ async def play(ctx: tanjun.abc.Context, query: str) -> None:
     except lavasnek_rs.NoSessionPresent:
         return await ctx.respond("Use `/join` to run this command.")
 
-    embed = hikari.Embed(
-        title="Tracks Added",
-        description=f"[{query_information.tracks[0].info.title}]({query_information.tracks[0].info.uri})",
-        color=0x00FF00,
-    )
+    if URL_REGEX.match(query):
+        embed = (
+            hikari.Embed(
+                title="Added a Playlist",
+                description=f"[{query_information.playlist_info.name}]({query})",
+                color=0x00FF00,
+            )
+            .add_field("Playtime", pretty_timedelta(timedelta(seconds=length / 1000)))
+            .set_thumbnail(
+                "https://static.vecteezy.com/system/resources/previews/002/238/014/original/playlist-icon-on-white-line-vector.jpg"
+            )
+        )
+    else:
+        embed = hikari.Embed(
+            title="Tracks Added",
+            description=f"[{query_information.tracks[0].info.title}]({query_information.tracks[0].info.uri})",
+            color=0x00FF00,
+        ).set_thumbnail(
+            "https://cdn.discordapp.com/attachments/853173570107342858/911225696993542224/music-player-song-pngrepo-com.png"
+        )
     await ctx.respond(embed=embed, component=DELETE_ROW)
 
 
