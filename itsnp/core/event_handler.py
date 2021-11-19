@@ -1,9 +1,11 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 import lavasnek_rs
 from hikari import Embed
+
+from itsnp.utils.time import pretty_timedelta_shortened
 
 if TYPE_CHECKING:
     from .bot import Bot
@@ -15,7 +17,9 @@ class EventHandler:
     def __init__(self, bot: "Bot") -> None:
         self.bot = bot
 
-    async def track_start(self, lavalink, event) -> None:
+    async def track_start(
+        self, lavalink: lavasnek_rs.Lavalink, event: lavasnek_rs.TrackStart
+    ) -> None:
         logger.info(f"Track started on Guild: {event.guild_id}")
         node = await lavalink.get_guild_node(event.guild_id)
 
@@ -24,11 +28,23 @@ class EventHandler:
             channel_id = data[event.guild_id]
             channel = self.bot.cache.get_guild_channel(channel_id)
 
-            embed = Embed(
-                title="Now Playing",
-                color=0x00FF00,
-                timestamp=datetime.now().astimezone(),
-                description=f"[{node.now_playing.track.info.title}]({node.now_playing.track.info.uri}) [<@{node.now_playing.requester}>]",
+            embed = (
+                Embed(
+                    title="Now Playing",
+                    color=0x00FF00,
+                    timestamp=datetime.now().astimezone(),
+                    description=f"[{node.now_playing.track.info.title}]({node.now_playing.track.info.uri})",
+                )
+                .add_field(
+                    "Length",
+                    pretty_timedelta_shortened(
+                        timedelta(seconds=node.now_playing.track.info.length / 1000)
+                    ),
+                )
+                .add_field(
+                    "Requested by", f"<@{node.now_playing.requester}>", inline=True
+                )
+                .add_field("Author", node.now_playing.track.info.author, inline=True)
             )
 
             await channel.send(embed=embed)
