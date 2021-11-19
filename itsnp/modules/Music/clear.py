@@ -15,16 +15,13 @@ async def clear_queue(ctx: tanjun.abc.Context) -> None:
     lavalink = fetch_lavalink(ctx)
     node = await lavalink.get_guild_node(ctx.guild_id)
 
-    if node.now_playing:
-        await lavalink.stop(ctx.guild_id)
-
     if not node.queue:
         raise tanjun.CommandError("No Tracks in the queue.")
 
-    queue = node.queue
+    queue = node.queue[1:]
 
     queue.clear()
-
+    queue.insert(0, node.queue[0])
     node.queue = queue
 
     await lavalink.set_guild_node(ctx.guild_id, node)
