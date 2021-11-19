@@ -1,6 +1,7 @@
 import re
 
 import hikari
+import lavasnek_rs
 import tanjun
 
 from itsnp.utils.buttons import DELETE_ROW
@@ -79,3 +80,7 @@ async def _leave(ctx: tanjun.abc.Context):
         color=0xFF0000,
     )
     await ctx.respond(embed=embed, component=DELETE_ROW)
+
+
+def fetch_lavalink(ctx: tanjun.abc.Context) -> lavasnek_rs.Lavalink:
+    return ctx.shards.data.lavalink
