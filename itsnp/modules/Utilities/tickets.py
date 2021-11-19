@@ -5,6 +5,7 @@ from datetime import datetime
 import hikari
 import tanjun
 from hikari.internal.cache import CacheMappingView
+from hikari.messages import ButtonStyle
 
 from itsnp.core.client import Client
 from itsnp.utils.utilities import FALSE_RESP, collect_response, yes_no_answer_validator
@@ -19,10 +20,30 @@ async def listen_for_ticket(
     event: hikari.InteractionCreateEvent,
     bot: hikari.GatewayBot = tanjun.injected(type=hikari.GatewayBotAware),
 ) -> None:
-    if (
-        not isinstance(event.interaction, hikari.ComponentInteraction)
-        or event.interaction.custom_id != "new_ticket"
-    ):
+    if not isinstance(
+        event.interaction, hikari.ComponentInteraction
+    ) or event.interaction.custom_id not in ["new_ticket", "close_ticket"]:
+        return
+
+    if event.interaction.custom_id == "close_ticket":
+        await event.app.rest.edit_channel(
+            event.interaction.channel_id,
+            permission_overwrites=[
+                hikari.PermissionOverwrite(
+                    id=event.interaction.member,
+                    type=1,
+                    deny=hikari.Permissions.VIEW_CHANNEL,
+                ),
+                hikari.PermissionOverwrite(
+                    id=event.interaction.guild_id,
+                    type=0,
+                    deny=hikari.Permissions.VIEW_CHANNEL,
+                ),
+            ],
+        )
+        await event.interaction.get_channel().send(
+            "Closed the Ticket, You can store it or delete it."
+        )
         return
 
     ticket_channel = None
@@ -67,6 +88,13 @@ async def listen_for_ticket(
             f"{event.interaction.member.mention}, please state your problems here.",
             user_mentions=True,
             embed=embed,
+            component=(
+                event.app.rest.build_action_row()
+                .add_button(ButtonStyle.PRIMARY, "close_ticket")
+                .set_emoji("🔒")
+                .set_label("Close Ticket")
+                .add_to_container()
+            ),
         )
     else:
         await ticket_channel.send(
