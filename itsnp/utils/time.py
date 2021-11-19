@@ -45,13 +45,13 @@ def pretty_timedelta_shortened(td: timedelta) -> str:
         if td >= span:
             count = int(td / span)
             td -= count * span
-            parts.append("{}{}".format(count, name))
+            parts.append("{}".format(f"0{count}" if count <= 9 else count))
             if len(parts) >= 2 or name == "s":
                 break
         elif len(parts):
             break
 
-    return " : ".join(parts)
+    return ":".join(parts)
 
 
 def pretty_timedelta(td: timedelta) -> str:
