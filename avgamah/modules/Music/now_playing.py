@@ -8,6 +8,8 @@ from avgamah.core.client import Client
 from avgamah.utils.buttons import DELETE_ROW
 from avgamah.utils.time import pretty_timedelta_shortened
 
+from . import fetch_lavalink
+
 now_playing_component = tanjun.Component()
 
 
@@ -21,7 +23,8 @@ now_playing_component = tanjun.Component()
 )
 @tanjun.as_slash_command("nowplaying", "See Currently Playing Song")
 async def now_playing(ctx: tanjun.abc.Context) -> None:
-    node: lavasnek_rs.Node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    lavalink = fetch_lavalink(ctx)
+    node = await lavalink.get_guild_node(ctx.guild_id)
 
     if not node or not node.now_playing:
         return await ctx.respond(

@@ -8,6 +8,8 @@ from avgamah.utils.pagination import paginate
 from avgamah.utils.time import pretty_timedelta_shortened
 from avgamah.utils.utilities import _chunk
 
+from . import fetch_lavalink
+
 queue_component = tanjun.Component()
 
 
@@ -22,7 +24,8 @@ queue_component = tanjun.Component()
 @tanjun.as_slash_command("queue", "Shows the music queue")
 async def queue(ctx: tanjun.abc.Context) -> None:
     song_queue = []
-    node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    lavalink = fetch_lavalink(ctx)
+    node = await lavalink.get_guild_node(ctx.guild_id)
 
     if not node or not node.queue:
         return await ctx.respond("There are no tracks in the queue!")

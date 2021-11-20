@@ -4,7 +4,7 @@ import tanjun
 from avgamah.core.client import Client
 from avgamah.utils.buttons import DELETE_ROW
 
-from . import check_voice_state
+from . import check_voice_state, fetch_lavalink
 
 remove_song_component = tanjun.Component()
 
@@ -21,7 +21,8 @@ remove_song_component = tanjun.Component()
 @tanjun.as_slash_command("removesong", "Remove a song at a specific index")
 @check_voice_state
 async def removesong(ctx: tanjun.abc.Context, index: int) -> None:
-    node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    lavalink = fetch_lavalink(ctx)
+    node = await lavalink.get_guild_node(ctx.guild_id)
     if not node.queue:
         return await ctx.respond("No songs in the queue.")
     queue: list = node.queue
@@ -32,7 +33,7 @@ async def removesong(ctx: tanjun.abc.Context, index: int) -> None:
         raise tanjun.CommandError("No such song in the queue.")
 
     node.queue = queue
-    await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
+    await lavalink.set_guild_node(ctx.guild_id, node)
     embed = hikari.Embed(
         title=f"Removed `{song_to_be_removed.track.info.title}` from the queue."
     )

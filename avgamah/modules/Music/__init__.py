@@ -1,4 +1,5 @@
 import re
+from math import tan
 
 import hikari
 import lavasnek_rs
@@ -42,9 +43,11 @@ def check_voice_state(f):
 
 
 async def _join(ctx: tanjun.abc.Context) -> int:
+    lavalink = fetch_lavalink(ctx)
     if ctx.cache.get_voice_state(ctx.get_guild(), await ctx.rest.fetch_my_user()):
         raise tanjun.CommandError("I am already connected to another Voice Channel.")
-    states = ctx.shards.cache.get_voice_states_view_for_guild(ctx.get_guild())
+
+    states = ctx.cache.get_voice_states_view_for_guild(ctx.get_guild())
     voice_state = list(filter(lambda i: i.user_id == ctx.author.id, states.iterator()))
 
     if not voice_state:
@@ -55,23 +58,24 @@ async def _join(ctx: tanjun.abc.Context) -> int:
     channel_id = voice_state[0].channel_id
 
     try:
-        connection_info = await ctx.shards.data.lavalink.join(ctx.guild_id, channel_id)
+        connection_info = await lavalink.join(ctx.guild_id, channel_id)
 
     except TimeoutError:
         return await ctx.respond(
             "I cannot connect to your voice channel!", component=DELETE_ROW
         )
 
-    await ctx.shards.data.lavalink.create_session(connection_info)
+    await lavalink.create_session(connection_info)
     return channel_id
 
 
 async def _leave(ctx: tanjun.abc.Context):
-    await ctx.shards.data.lavalink.destroy(ctx.guild_id)
-    await ctx.shards.data.lavalink.stop(ctx.guild_id)
-    await ctx.shards.data.lavalink.leave(ctx.guild_id)
-    await ctx.shards.data.lavalink.remove_guild_node(ctx.guild_id)
-    await ctx.shards.data.lavalink.remove_guild_from_loops(ctx.guild_id)
+    lavalink = fetch_lavalink(ctx)
+    await lavalink.destroy(ctx.guild_id)
+    await lavalink.stop(ctx.guild_id)
+    await lavalink.leave(ctx.guild_id)
+    await lavalink.remove_guild_node(ctx.guild_id)
+    await lavalink.remove_guild_from_loops(ctx.guild_id)
 
     embed = hikari.Embed(
         description="I left the voice channel!",

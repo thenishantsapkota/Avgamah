@@ -5,6 +5,7 @@ import hikari
 import tanjun
 
 from avgamah.core.client import Client
+from avgamah.modules.Music import fetch_lavalink
 from avgamah.utils.pagination import paginate
 from avgamah.utils.utilities import _chunk
 
@@ -21,7 +22,8 @@ lyrics_component = tanjun.Component()
 )
 @tanjun.as_slash_command("lyrics", "Get lyrics of Currently playing song")
 async def lyrics(ctx: tanjun.abc.Context) -> None:
-    node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    lavalink = fetch_lavalink(ctx)
+    node = await lavalink.get_guild_node(ctx.guild_id)
     if not node.now_playing:
         return await ctx.respond("There's nothing playing at the moment!")
     song_name = node.now_playing.track.info.title

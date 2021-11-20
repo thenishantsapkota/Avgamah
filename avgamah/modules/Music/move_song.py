@@ -4,7 +4,7 @@ import tanjun
 from avgamah.core.client import Client
 from avgamah.utils.buttons import DELETE_ROW
 
-from . import check_voice_state
+from . import check_voice_state, fetch_lavalink
 
 move_song_component = tanjun.Component()
 
@@ -22,7 +22,8 @@ move_song_component = tanjun.Component()
 @tanjun.as_slash_command("movesong", "Move a song to a specific index")
 @check_voice_state
 async def movesong(ctx: tanjun.abc.Context, old_index: int, new_index: int) -> None:
-    node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    lavalink = fetch_lavalink(ctx)
+    node = await lavalink.get_guild_node(ctx.guild_id)
     if not len(node.queue) >= 1:
         return ctx.respond("Only one song in the queue!")
     queue = node.queue
@@ -34,7 +35,7 @@ async def movesong(ctx: tanjun.abc.Context, old_index: int, new_index: int) -> N
         raise tanjun.CommandError("No such song in the queue.")
 
     node.queue = queue
-    await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
+    await lavalink.set_guild_node(ctx.guild_id, node)
     embed = hikari.Embed(
         title=f"Moved `{song_to_be_moved.track.info.title}` to Position `{new_index}`",
         color=0x00FF00,

@@ -4,7 +4,7 @@ import tanjun
 from avgamah.core.client import Client
 from avgamah.utils.buttons import DELETE_ROW
 
-from . import check_voice_state
+from . import check_voice_state, fetch_lavalink
 
 volume_component = tanjun.Component()
 
@@ -21,7 +21,8 @@ volume_component = tanjun.Component()
 @tanjun.as_slash_command("volume", "Increase/Decrease the volume")
 @check_voice_state
 async def volume(ctx: tanjun.abc.Context, volume: int) -> None:
-    node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    lavalink = fetch_lavalink(ctx)
+    node = await lavalink.get_guild_node(ctx.guild_id)
 
     if not node or not node.now_playing:
         return await ctx.respond(
@@ -29,7 +30,7 @@ async def volume(ctx: tanjun.abc.Context, volume: int) -> None:
         )
 
     if 0 < volume <= 100:
-        await ctx.shards.data.lavalink.volume(ctx.guild_id, volume)
+        await lavalink.volume(ctx.guild_id, volume)
         embed = hikari.Embed(
             description=f"⏯️ Set the Volume to {volume}", color=0x00FF00
         )

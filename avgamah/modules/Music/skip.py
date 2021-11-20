@@ -4,7 +4,7 @@ import tanjun
 from avgamah.core.client import Client
 from avgamah.utils.buttons import DELETE_ROW
 
-from . import check_voice_state
+from . import check_voice_state, fetch_lavalink
 
 skip_component = tanjun.Component()
 
@@ -20,15 +20,16 @@ skip_component = tanjun.Component()
 @tanjun.as_slash_command("skip", "Skips the current song")
 @check_voice_state
 async def skip(ctx: tanjun.abc.Context) -> None:
+    lavalink = fetch_lavalink(ctx)
 
-    skip = await ctx.shards.data.lavalink.skip(ctx.guild_id)
-    node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    skip = await lavalink.skip(ctx.guild_id)
+    node = await lavalink.get_guild_node(ctx.guild_id)
 
     if not skip:
         return await ctx.respond("Nothing to skip")
 
     if not node.queue and not node.now_playing:
-        await ctx.shards.data.lavalink.stop(ctx.guild_id)
+        await lavalink.stop(ctx.guild_id)
 
     em = hikari.Embed(
         title="⏭️ Skipped",

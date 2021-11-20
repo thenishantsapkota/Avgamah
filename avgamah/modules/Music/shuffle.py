@@ -6,7 +6,7 @@ import tanjun
 from avgamah.core.client import Client
 from avgamah.utils.buttons import DELETE_ROW
 
-from . import check_voice_state
+from . import check_voice_state, fetch_lavalink
 
 shuffle_component = tanjun.Component()
 
@@ -22,7 +22,8 @@ shuffle_component = tanjun.Component()
 @tanjun.as_slash_command("shuffle", "Shuffle the current queue")
 @check_voice_state
 async def shuffle(ctx: tanjun.abc.Context) -> None:
-    node = await ctx.shards.data.lavalink.get_guild_node(ctx.guild_id)
+    lavalink = fetch_lavalink(ctx)
+    node = await lavalink.get_guild_node(ctx.guild_id)
     if not len(node.queue) > 1:
         return ctx.respond("Only one song in the queue!")
 
@@ -32,7 +33,7 @@ async def shuffle(ctx: tanjun.abc.Context) -> None:
     queue.insert(0, node.queue[0])
 
     node.queue = queue
-    await ctx.shards.data.lavalink.set_guild_node(ctx.guild_id, node)
+    await lavalink.set_guild_node(ctx.guild_id, node)
 
     embed = hikari.Embed(title="🔀 Shuffled Queue", color=0x00FF00)
     await ctx.respond(embed=embed, component=DELETE_ROW)
