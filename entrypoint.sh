@@ -15,4 +15,4 @@ fi
 
 
 sleep 5s
-python -m itsnp
+python -m avgamah
