@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import Type
 
 import hikari
 import httpx
@@ -14,13 +15,19 @@ youtube_component = tanjun.Component()
 
 
 @youtube_component.with_slash_command
+@tanjun.with_own_permission_check(
+    hikari.Permissions.CREATE_INSTANT_INVITE | hikari.Permissions.VIEW_CHANNEL
+)
+@tanjun.with_author_permission_check(hikari.Permissions.VIEW_CHANNEL)
 @tanjun.with_str_slash_option(
     "activity",
     "Activity you wanna start",
     choices=(x.lower() for x in activities),
 )
 @tanjun.with_channel_slash_option(
-    "channel", "Channel where you want to start the activities(VC Only)"
+    "channel",
+    "Channel where you want to start the activities(VC Only)",
+    types=[hikari.GuildVoiceChannel],
 )
 @tanjun.as_slash_command("activity", "Discord Activities")
 async def youtube_together(
