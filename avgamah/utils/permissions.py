@@ -7,8 +7,6 @@ from models import ModerationRoles
 
 from .utilities import get
 
-# from typing import Any, Iterable, Optional, TypeVar, Union
-
 
 class Permissions:
     """Custom class for checking guild settings to handle moderation commands."""
@@ -16,6 +14,21 @@ class Permissions:
     async def has_permissions(
         self, member: hikari.Member, permission: list[hikari.Permissions]
     ) -> bool:
+        """
+        Function that checks if user has correct permissions or the correct roles
+
+        Parameters
+        ----------
+        member : hikari.Member
+            Member on whom the check is to be performed
+        permission : list[hikari.Permissions]
+            Permissions to be checked against the user.
+
+        Returns
+        -------
+        bool
+            Returns True if member has required permissions else returns False
+        """
         roles = member.get_roles()
         perms = hikari.Permissions.NONE
 
@@ -56,14 +69,19 @@ class Permissions:
         self, ctx: tanjun.abc.Context, guild: hikari.Guild
     ) -> None:
         """
-        Function that checks if the user has "Staff Role" or the "Manage Messages" permission.
+        Function that checks if user has "Staff Role" or the "Manage Messages" permission.
 
-        Args:
-            ctx (tanjun.abc.Context): Context of the slash command invokation
-            guild (hikari.Guild): Guild Where the check is to be done
+        Parameters
+        ----------
+        ctx : tanjun.abc.Context
+            Context of the command invkokation
+        guild : hikari.Guild
+            Guild where the check is to be done.
 
-        Raises:
-            tanjun.CommandError: Raised when user doesn't have proper permissions.
+        Raises
+        ------
+        tanjun.CommandError
+            Raised when user doesn't have the required permissions.
         """
         staff_role = (await self.fetch_role_data(guild)).get("staffrole")
         if not (
@@ -78,14 +96,19 @@ class Permissions:
         self, ctx: tanjun.abc.Context, guild: hikari.Guild
     ) -> None:
         """
-        Function that checks if the user has "Mod Role" or the "Kick Members" permission.
+        Function that checks if user has "Mod Role" or the "Manage Roles" permission.
 
-        Args:
-            ctx (tanjun.abc.Context): Context of the Command Invokation
-            guild (hikari.Guild): Guild where the check is to be done
+        Parameters
+        ----------
+        ctx : tanjun.abc.Context
+            Context of the command invkokation
+        guild : hikari.Guild
+            Guild where the check is to be done.
 
-        Raises:
-            tanjun.CommandError: Raised when user doesn't have proper permissions.
+        Raises
+        ------
+        tanjun.CommandError
+            Raised when user doesn't have the required permissions.
         """
         mod_role = (await self.fetch_role_data(guild)).get("modrole")
         if not (
@@ -99,6 +122,21 @@ class Permissions:
     async def admin_role_check(
         self, ctx: tanjun.abc.Context, guild: hikari.Guild
     ) -> None:
+        """
+        Function that checks if user has "Administrator Role" or the "Administrator" permission.
+
+        Parameters
+        ----------
+        ctx : tanjun.abc.Context
+            Context of the command invkokation
+        guild : hikari.Guild
+            Guild where the check is to be done.
+
+        Raises
+        ------
+        tanjun.CommandError
+            Raised when user doesn't have the required permissions.
+        """
         admin_role = (await self.fetch_role_data(guild)).get("adminrole")
         if not (
             await self.has_permissions(ctx.member, ["ADMINISTRATOR"])
@@ -112,14 +150,19 @@ class Permissions:
         self, ctx: tanjun.abc.Context, guild: hikari.Guild
     ) -> hikari.GuildTextChannel:
         """
-        Function that checks if "mod-logs" channel exists in a guild, if not it creates one.
+        Function that checks for "mod-logs" channel in a guild, if not it creates one
 
-        Args:
-            ctx (tanjun.abc.Context): Context of the command invokation
-            guild (hikari.Guild): Guild where the channel is to be checked
+        Parameters
+        ----------
+        ctx : tanjun.abc.Context
+            Context of the command invokation
+        guild : hikari.Guild
+            Guild in which log channel is to be checked
 
-        Returns:
-            hikari.GuildTextChannel: Text Channel of the log channel
+        Returns
+        -------
+        hikari.GuildTextChannel
+            Returns TextChannel object of "mod-logs" channel.
         """
         log_channel = get(await ctx.rest.fetch_guild_channels(guild), name="mod-logs")
         if log_channel is None:
@@ -133,14 +176,20 @@ class Permissions:
     async def muted_role_check(
         self, ctx: tanjun.abc.Context, guild: hikari.Guild
     ) -> hikari.Role:
-        """Function that checks for "Muted" role in the guild
+        """
+        Function that checks for muted role in the guild
 
-        Args:
-            ctx (tanjun.abc.Context): Context of the Slash Command Invokation
-            guild (hikari.Guild): Guild where the muted role is to checked for existance
+        Parameters
+        ----------
+        ctx : tanjun.abc.Context
+            Context of the command invokation
+        guild : hikari.Guild
+            Guild in which muted role is to be checked.
 
-        Returns:
-            hikari.Role: Muted Role of the server
+        Returns
+        -------
+        hikari.Role
+            Returns the "Muted" role by creating if it doesn't exist or returns the role by fetching the role.
         """
         muted_role = get(await ctx.rest.fetch_roles(guild), name="Muted")
         if muted_role is None:
@@ -155,14 +204,20 @@ class Permissions:
     async def check_higher_role(
         self, author: hikari.Member, member: hikari.Member
     ) -> None:
-        """Function that checks if the command author has higher role than the member
+        """
+        Function that checks if the command author has higher role than the member
 
-        Args:
-            author (hikari.Member): Author of the Command Invokation
-            member (hikari.Member): Member against whom author's permissions are to be checked
+        Parameters
+        ----------
+        author : hikari.Member
+            Author of the Command Invokation
+        member : hikari.Member
+            Member against whom author's permissions are to be checked
 
-        Raises:
-            tanjun.CommandError: Error raised when Author role is not higher than Member's top role
+        Raises
+        ------
+        tanjun.CommandError
+            Error raised when Author role is not higher than Member's top role
         """
         author_top_role = author.get_top_role()
         member_top_role = member.get_top_role()
@@ -173,13 +228,18 @@ class Permissions:
             )
 
     async def check_booster_role(self, member: hikari.Member) -> hikari.Role | None:
-        """Function that checks for booster role in the guild
+        """
+        Function that checks for booster role in the guild
 
-        Args:
-            member (hikari.Member): Member on whom the role is to be checked
+        Parameters
+        ----------
+        member : hikari.Member
+            Member on whom the role is to be checked
 
-        Returns:
-            Union[hikari.Role, None]: Gets the booster role if exists on the member else returns None
+        Returns
+        -------
+        hikari.Role | None
+            Gets the booster role if exists on the member else returns None
         """
         for role in member.get_roles():
             if role.is_premium_subscriber_role:
