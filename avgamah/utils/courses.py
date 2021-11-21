@@ -11,7 +11,20 @@ class CoursesNotFound(tanjun.CommandError):
     pass
 
 
-async def req(url):
+async def req(url: str) -> str:
+    """
+    Function that makes a request to specific website and returns the text content
+
+    Parameters
+    ----------
+    url : str
+        URL on which request is to be sent
+
+    Returns
+    -------
+    str
+        Response text of the request.
+    """
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             varr = await response.text()
@@ -19,7 +32,25 @@ async def req(url):
 
 
 class Courses:
-    async def get_course(self, topic):
+    async def get_course(self, topic: str) -> dict:
+        """
+        Helper function that scrapes "https://discudemy.com" and searches for courses according to the query.
+
+        Parameters
+        ----------
+        topic : str
+            Course topic to search for
+
+        Returns
+        -------
+        dict
+            Dictionary containing the course details.
+
+        Raises
+        ------
+        CoursesNotFound
+            Raised when no courses are found from the given query.
+        """
         try:
             content = await req((baseurl + topic))
             html_content = BeautifulSoup(content, "html.parser")
@@ -29,7 +60,7 @@ class Courses:
             course_description = (content_in_div.find("div", "description")).text
             image_link = (content_in_div.find("amp-img"))["src"]
         except AttributeError:
-            raise CoursesNotFound("No Courses found with that topic.")
+            raise tanjun.CommandError("No courses found with that topic.")
 
         p1 = await req(link_to_course)
         p1_html = (BeautifulSoup(p1, "html.parser")).find(
