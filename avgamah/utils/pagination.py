@@ -12,6 +12,18 @@ async def paginate(
     fields: t.Generator[tuple | list],
     timeout: float | str,
 ):
+    """
+    A helper function that assists in generating embed paginations by passing in a generator and timeout value.
+
+    Parameters
+    ----------
+    ctx : tanjun.abc.Context
+        Context of the command invokation
+    fields : t.Generator[tuple | list]
+        Generator object containing the embeds to be generated.
+    timeout : float
+        Timeout of the pagination(in seconds)
+    """
     paginator = yuyo.ComponentPaginator(
         fields,
         authors=(ctx.author.id,),
