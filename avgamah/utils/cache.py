@@ -34,6 +34,10 @@ class CacheRedditPosts:
         )
 
     async def get_posts(self):
+        """
+        Helper function that gets posts from Reddit and stores them in Redis.
+        Quite a tounge twister I know ;)
+        """
         subreddits = [
             await self.reddit.subreddit(subreddit) for subreddit in self.subreddits
         ]
@@ -69,6 +73,24 @@ class CacheRedditPosts:
             )
 
     async def get_random_post(self, subreddit: str) -> dict[str, str]:
+        """
+        Function that gets random post from the cache.
+
+        Parameters
+        ----------
+        subreddit : str
+            Name of the subreddit
+
+        Returns
+        -------
+        dict[str, str]
+            Returns dict containing info about the post.
+
+        Raises
+        ------
+        tanjun.CommandError
+            Raised when no posts are found in the cache.
+        """
         data = await self.bot.redis.get(subreddit)
         data_json = json.loads(data)
 
@@ -94,6 +116,9 @@ class CacheRedditPosts:
         await ctx.respond(embed=embed, component=DELETE_ROW)
 
     async def fetch_posts(self) -> None:
+        """
+        Function that fetches posts from Reddit and stores them in Redis every 30 minutes.
+        """
         while True:
             await self.get_posts()
             await asyncio.sleep(1800)
