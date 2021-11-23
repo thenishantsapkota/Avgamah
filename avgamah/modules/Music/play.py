@@ -36,8 +36,7 @@ async def play(ctx: tanjun.abc.Context, query: str, spotify: bool) -> None:
         await _join(ctx)
 
     if spotify:
-        await handle_spotify(ctx, query)
-        return
+        raise tanjun.CommandError("Not Implemented Yet!")
     query_information = await lavalink.auto_search_tracks(query)
 
     if not query_information.tracks:
