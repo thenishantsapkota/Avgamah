@@ -55,9 +55,7 @@ async def _join(ctx: tanjun.abc.Context) -> int:
     voice_state = list(filter(lambda i: i.user_id == ctx.author.id, states.iterator()))
 
     if not voice_state:
-        return await ctx.respond(
-            "Connect to a voice channel to continue!", component=DELETE_ROW
-        )
+        raise tanjun.CommandError("Connect to a voice channel to continue!")
 
     channel_id = voice_state[0].channel_id
 
@@ -65,9 +63,7 @@ async def _join(ctx: tanjun.abc.Context) -> int:
         connection_info = await lavalink.join(ctx.guild_id, channel_id)
 
     except TimeoutError:
-        return await ctx.respond(
-            "I cannot connect to your voice channel!", component=DELETE_ROW
-        )
+        raise tanjun.CommandError("I cannot connect to your voice channel!")
 
     await lavalink.create_session(connection_info)
     return channel_id
