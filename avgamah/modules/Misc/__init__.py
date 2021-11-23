@@ -11,3 +11,16 @@ application_ids = {
 }
 
 activities = list(application_ids.keys())
+
+zodiac_signs = [
+    "aries",
+    "taurus",
+    "gemini",
+    "cancer" "leo",
+    "virgo",
+    "libra",
+    "scorpio",
+    "sagittarius" "capricorn",
+    "aquarius",
+    "pisces",
+]
