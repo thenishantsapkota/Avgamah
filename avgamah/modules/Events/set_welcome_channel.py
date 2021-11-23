@@ -19,7 +19,9 @@ set_welcome_component = tanjun.Component()
     | hikari.Permissions.EMBED_LINKS
 )
 @tanjun.with_channel_slash_option(
-    "channel", "The channel you want to set as Welcome Channel"
+    "channel",
+    "The channel you want to set as Welcome Channel",
+    types=[hikari.GuildTextChannel],
 )
 @tanjun.as_slash_command(
     "setwelcomechannel",

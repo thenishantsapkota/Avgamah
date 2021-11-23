@@ -36,15 +36,20 @@ class EventHandler:
                     description=f"[{node.now_playing.track.info.title}]({node.now_playing.track.info.uri})",
                 )
                 .add_field(
-                    "Length",
-                    pretty_timedelta_shortened(
+                    name="Length",
+                    value=pretty_timedelta_shortened(
                         timedelta(seconds=node.now_playing.track.info.length / 1000)
                     ),
+                    inline=True,
                 )
                 .add_field(
-                    "Requested by", f"<@{node.now_playing.requester}>", inline=True
+                    name="Requested by",
+                    value=f"<@{node.now_playing.requester}>",
+                    inline=True,
                 )
-                .add_field("Author", node.now_playing.track.info.author, inline=True)
+                .add_field(
+                    name="Author", value=node.now_playing.track.info.author, inline=True
+                )
             )
 
             await channel.send(embed=embed)

@@ -7,6 +7,7 @@ application_ids = {
     "Word Snacks": 879863976006127627,
     "Spell Cast": 852509694341283871,
     "Letter Tile": 879863686565621790,
+    "Chess": 832012774040141894,
 }
 
 activities = list(application_ids.keys())

@@ -23,6 +23,7 @@ slowmode_component = tanjun.Component()
     "channel",
     "Channel you want slowmode invoked in(TextChannels)",
     default=None,
+    types=[hikari.GuildTextChannel],
 )
 @tanjun.as_slash_command("slowmode", "Invoke slowmode in the selected channel")
 async def slowmode(

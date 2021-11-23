@@ -1,11 +1,14 @@
 import re
-from math import tan
 
 import hikari
 import lavasnek_rs
 import tanjun
 
+from avgamah.utils import spotify
 from avgamah.utils.buttons import DELETE_ROW
+from config import spotify_config
+
+TIME_REGEX = r"([0-9]{1,2})[:ms](([0-9]{1,2})s?)?"
 
 URL_REGEX = re.compile(r"^.*(youtu.be\/|list=)([^#\&\?]*).*")
 
@@ -86,3 +89,31 @@ async def _leave(ctx: tanjun.abc.Context):
 
 def fetch_lavalink(ctx: tanjun.abc.Context) -> lavasnek_rs.Lavalink:
     return ctx.shards.data.lavalink
+
+
+async def handle_spotify(ctx: tanjun.abc.Context, url: str) -> None:
+    lavalink = fetch_lavalink(ctx)
+    spotify_client = spotify.SpotifyClient(
+        client_id=spotify_config.client_id, client_secret=spotify_config.client_secret
+    )
+
+    track = await spotify.SpotifyTrack.search(query=url, return_first=True)
+    try:
+        await lavalink.play(ctx.guild_id, track).requester(ctx.author.id).queue()
+
+        node = await lavalink.get_guild_node(ctx.guild_id)
+        if not node:
+            pass
+        else:
+            await node.set_data({ctx.guild_id: ctx.channel_id})
+
+    except lavasnek_rs.NoSessionPresent:
+        return await ctx.respond("Use `/join` to run this command.")
+
+    await ctx.respond(
+        embed=hikari.Embed(
+            title="Tracks Added",
+            description=f"[{track.info.title}]({track.info.uri})",
+            color=0x00FF00,
+        )
+    )

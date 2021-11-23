@@ -63,7 +63,7 @@ async def colors(ctx: tanjun.abc.Context) -> None:
             )
         else:
             await ColorModel.get_or_create(
-                guild_id=ctx.guild_id, role_id=role.id, name=role.name
+                guild_id=ctx.guild_id, role_id=role.id, role_name=role.name
             )
     embed = hikari.Embed(
         title="Colors",

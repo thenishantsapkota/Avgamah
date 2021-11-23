@@ -35,7 +35,7 @@ async def mute_handler(
     pretty_time = pretty_timedelta(timedelta(seconds=time))
     booster_role = await permissions.check_booster_role(member)
 
-    if muted_role not in await member.fetch_roles():
+    if muted_role.id not in member.role_ids:
         end_time = datetime.now() + timedelta(seconds=time)
         role_ids = ",".join([str(r) for r in member.role_ids])
         model, _ = await MuteModel.get_or_create(
@@ -81,7 +81,7 @@ async def mute_handler(
 
     if len(unmutes):
         await asyncio.sleep(time)
-        updated_member = await ctx.rest.fetch_member(ctx.get_guild(), member.user)
+        updated_member = ctx.cache.get_member(ctx.guild_id, member.id)
         await unmute_handler(ctx, updated_member)
 
 

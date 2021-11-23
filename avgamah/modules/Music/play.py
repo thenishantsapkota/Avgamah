@@ -3,13 +3,12 @@ from datetime import timedelta
 import hikari
 import lavasnek_rs
 import tanjun
-from hikari.files import URL
 
 from avgamah.core.client import Client
 from avgamah.utils.buttons import DELETE_ROW
 from avgamah.utils.time import pretty_timedelta
 
-from . import URL_REGEX, _join, fetch_lavalink
+from . import URL_REGEX, _join, fetch_lavalink, handle_spotify
 
 play_component = tanjun.Component()
 
@@ -22,15 +21,23 @@ play_component = tanjun.Component()
     | hikari.Permissions.CONNECT
     | hikari.Permissions.SPEAK
 )
+@tanjun.with_bool_slash_option(
+    "spotify", "Choose if the link is a spotify link.", default=None
+)
 @tanjun.with_str_slash_option("query", "Name of the song or URL")
 @tanjun.as_slash_command("play", "Play a song")
-async def play(ctx: tanjun.abc.Context, query: str) -> None:
+async def play(ctx: tanjun.abc.Context, query: str, spotify: bool) -> None:
     length = 0
     lavalink = fetch_lavalink(ctx)
+
     con = await lavalink.get_guild_gateway_connection_info(ctx.guild_id)
 
     if not con:
         await _join(ctx)
+
+    if spotify:
+        await handle_spotify(ctx, query)
+        return
     query_information = await lavalink.auto_search_tracks(query)
 
     if not query_information.tracks:
