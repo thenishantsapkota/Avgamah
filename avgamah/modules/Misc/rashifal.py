@@ -10,7 +10,6 @@ rashifal_component = tanjun.Component()
 
 
 @rashifal_component.with_slash_command
-@tanjun.with_cooldown("Fun")
 @tanjun.with_str_slash_option(
     "zodiac", "Your zodiac Sign", choices=[sign for sign in zodiac_signs], default=None
 )
