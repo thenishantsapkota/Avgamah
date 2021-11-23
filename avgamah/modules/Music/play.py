@@ -8,7 +8,7 @@ from avgamah.core.client import Client
 from avgamah.utils.buttons import DELETE_ROW
 from avgamah.utils.time import pretty_timedelta
 
-from . import URL_REGEX, _join, fetch_lavalink, handle_spotify
+from . import URL_REGEX, _join, fetch_lavalink
 
 play_component = tanjun.Component()
 
