@@ -2,6 +2,7 @@ import logging
 
 import hikari
 import tanjun
+from hikari.colors import Color
 
 from avgamah.core import Client
 from avgamah.modules.Utilities.embeds import EMBED_MENU
@@ -59,6 +60,10 @@ async def colors(ctx: tanjun.abc.Context) -> None:
             color_role = await ctx.rest.create_role(guild=guild, name=name, color=color)
             await ColorModel.get_or_create(
                 guild_id=ctx.guild_id, role_id=color_role.id, role_name=color_role.name
+            )
+        else:
+            await ColorModel.get_or_create(
+                guild_id=ctx.guild_id, role_id=role.id, name=role.name
             )
     embed = hikari.Embed(
         title="Colors",
