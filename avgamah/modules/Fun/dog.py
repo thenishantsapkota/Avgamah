@@ -16,6 +16,7 @@ dog_component = tanjun.Component()
     | hikari.Permissions.VIEW_CHANNEL
     | hikari.Permissions.EMBED_LINKS
 )
+@tanjun.with_cooldown("Fun")
 @tanjun.as_slash_command("dog", "Return a dog gif.", default_to_ephemeral=True)
 async def dog_command(ctx: tanjun.abc.Context) -> None:
     async with aiohttp.ClientSession() as session:

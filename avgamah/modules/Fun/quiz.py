@@ -19,6 +19,7 @@ async def on_select_menu_interaction(ctx: yuyo.ComponentContext):
 
 
 @quiz_component.with_slash_command
+@tanjun.with_cooldown("Fun")
 @tanjun.with_str_slash_option(
     "difficulty",
     "Choose the difficulty of a question",

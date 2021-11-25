@@ -16,6 +16,7 @@ joke_component = tanjun.Component()
         "twopart",
     ),
 )
+@tanjun.with_cooldown("Fun")
 @tanjun.with_str_slash_option(
     "category",
     "Category of joke you want",

@@ -11,6 +11,7 @@ cat_component = tanjun.Component()
 
 
 @cat_component.with_slash_command
+@tanjun.with_cooldown("Fun")
 @tanjun.with_own_permission_check(
     hikari.Permissions.SEND_MESSAGES
     | hikari.Permissions.VIEW_CHANNEL
@@ -38,3 +39,8 @@ async def cat_command(ctx: tanjun.abc.Context) -> None:
 @tanjun.as_loader
 def load_components(client: Client):
     client.add_component(cat_component.copy())
+    (
+        tanjun.InMemoryCooldownManager()
+        .set_bucket("Fun", tanjun.BucketResource.USER, 1, 5)
+        .add_to_client(client)
+    )
