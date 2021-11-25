@@ -12,7 +12,8 @@ from tortoise import Tortoise
 from avgamah import TEST_GUILD_ID, __version__
 from avgamah.utils.activity import CustomActivity
 from avgamah.utils.buttons import DELETE_CUSTOM_ID, delete_message_button
-from avgamah.utils.cache import CacheRedditPosts
+from avgamah.utils.Cache.rashifal_cache import CacheRashifal
+from avgamah.utils.Cache.reddit_cache import CacheRedditPosts
 from config import bot_config, lavalink_config
 from tortoise_config import tortoise_config
 
@@ -37,6 +38,7 @@ class Bot(hikari.GatewayBot):
         self.data = Data()
         self.redis = aioredis.from_url(url="redis://redis")
         self.reddit_cache = CacheRedditPosts(self)
+        self.rashifal_cache = CacheRashifal(self)
         self.component_client = yuyo.ComponentClient.from_gateway_bot(
             self, event_managed=False
         ).set_constant_id(DELETE_CUSTOM_ID, delete_message_button)
@@ -44,7 +46,7 @@ class Bot(hikari.GatewayBot):
     def create_client(self: _AVGAMAH) -> None:
         """Function that creates the tanjun client"""
         self.client = Client.from_gateway_bot(
-            self, declare_global_commands=TEST_GUILD_ID, mention_prefix=True
+            self, declare_global_commands=True, mention_prefix=True
         )
         (
             self.client.add_client_callback(
@@ -77,6 +79,7 @@ class Bot(hikari.GatewayBot):
 
     async def on_started(self: _AVGAMAH, _: hikari.StartedEvent) -> None:
         asyncio.create_task(CustomActivity(self).change_status())
+        asyncio.create_task(CacheRashifal(self).fetch_rashifal())
         asyncio.create_task(CacheRedditPosts(self).fetch_posts())
         builder = (
             lavasnek_rs.LavalinkBuilder(self.get_me().id, bot_config.token)
