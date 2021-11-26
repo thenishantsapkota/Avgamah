@@ -1,3 +1,4 @@
+import asyncio
 import re
 
 import hikari
@@ -6,6 +7,8 @@ import tanjun
 
 # from avgamah.utils import spotify
 from avgamah.utils.buttons import DELETE_ROW
+from avgamah.utils.spotify import get_tracks_from_playlist
+from config import spotify_config
 
 # from config import spotify_config
 
@@ -88,29 +91,25 @@ def fetch_lavalink(ctx: tanjun.abc.Context) -> lavasnek_rs.Lavalink:
     return ctx.shards.data.lavalink
 
 
-# async def handle_spotify(ctx: tanjun.abc.Context, url: str) -> None:
-#     lavalink = fetch_lavalink(ctx)
-#     spotify_client = spotify.SpotifyClient(
-#         client_id=spotify_config.client_id, client_secret=spotify_config.client_secret
-#     )
+async def handle_spotify(ctx: tanjun.abc.Context, url: str) -> None:
+    lavalink = fetch_lavalink(ctx)
+    songs = await get_tracks_from_playlist(url)
+    await ctx.respond(
+        "Loading the Spotify Playlist...\nThis may take some time depending on the size of your playlist."
+    )
 
-#     track = await spotify.SpotifyTrack.search(query=url, return_first=True)
-#     try:
-#         await lavalink.play(ctx.guild_id, track).requester(ctx.author.id).queue()
+    tracks = [(await lavalink.auto_search_tracks(song)).tracks[0] for song in songs]
 
-#         node = await lavalink.get_guild_node(ctx.guild_id)
-#         if not node:
-#             pass
-#         else:
-#             await node.set_data({ctx.guild_id: ctx.channel_id})
+    for track in tracks:
+        try:
+            await lavalink.play(ctx.guild_id, track).requester(ctx.author.id).queue()
 
-#     except lavasnek_rs.NoSessionPresent:
-#         return await ctx.respond("Use `/join` to run this command.")
+            node = await lavalink.get_guild_node(ctx.guild_id)
+            if not node:
+                pass
+            else:
+                node.set_data({ctx.guild_id: ctx.channel_id})
+        except lavasnek_rs.NoSessionPresent:
+            raise tanjun.CommandError("Use `/join` to run this command.")
 
-#     await ctx.respond(
-#         embed=hikari.Embed(
-#             title="Tracks Added",
-#             description=f"[{track.info.title}]({track.info.uri})",
-#             color=0x00FF00,
-#         )
-#     )
+    await ctx.edit_last_response(f"Added Spotify Playlist `{url}` to the queue.")

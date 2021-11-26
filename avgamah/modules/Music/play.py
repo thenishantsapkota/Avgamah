@@ -8,7 +8,7 @@ from avgamah.core.client import Client
 from avgamah.utils.buttons import DELETE_ROW
 from avgamah.utils.time import pretty_timedelta
 
-from . import URL_REGEX, _join, fetch_lavalink
+from . import URL_REGEX, _join, fetch_lavalink, handle_spotify
 
 play_component = tanjun.Component()
 
@@ -36,7 +36,8 @@ async def play(ctx: tanjun.abc.Context, query: str, spotify: bool) -> None:
         await _join(ctx)
 
     if spotify:
-        raise tanjun.CommandError("Not Implemented Yet!")
+        await handle_spotify(ctx, query)
+        return
     query_information = await lavalink.auto_search_tracks(query)
 
     if not query_information.tracks:
