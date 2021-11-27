@@ -5,12 +5,8 @@ import hikari
 import lavasnek_rs
 import tanjun
 
-# from avgamah.utils import spotify
 from avgamah.utils.buttons import DELETE_ROW
 from avgamah.utils.spotify import get_tracks_from_playlist
-from config import spotify_config
-
-# from config import spotify_config
 
 TIME_REGEX = r"([0-9]{1,2})[:ms](([0-9]{1,2})s?)?"
 
@@ -94,15 +90,23 @@ def fetch_lavalink(ctx: tanjun.abc.Context) -> lavasnek_rs.Lavalink:
 async def handle_spotify(ctx: tanjun.abc.Context, url: str) -> None:
     lavalink = fetch_lavalink(ctx)
     songs = await get_tracks_from_playlist(url)
+
     await ctx.respond(
-        "Loading the Spotify Playlist...\nThis may take some time depending on the size of your playlist."
+        "Loading the Spotify Playlist...\nThis may take some time depending on the size of your playlist.\nEnjoy the first track while I load the rest of the playlist xD."
     )
 
-    tracks = [(await lavalink.auto_search_tracks(song)).tracks[0] for song in songs]
+    await lavalink.play(
+        ctx.guild_id, (await lavalink.auto_search_tracks(songs[0])).tracks[0]
+    ).requester(ctx.author.id).queue()
+
+    tasks = [lavalink.auto_search_tracks(song) for song in songs[1:]]
+    tracks = await asyncio.gather(*tasks)
 
     for track in tracks:
         try:
-            await lavalink.play(ctx.guild_id, track).requester(ctx.author.id).queue()
+            await lavalink.play(ctx.guild_id, track.tracks[0]).requester(
+                ctx.author.id
+            ).queue()
 
             node = await lavalink.get_guild_node(ctx.guild_id)
             if not node:
