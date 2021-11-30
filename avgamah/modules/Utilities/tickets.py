@@ -113,7 +113,7 @@ TICKETS = ticket_component.with_slash_command(
 
 
 @TICKETS.with_command
-@tanjun.with_owner_check
+@tanjun.with_author_permission_check(hikari.Permissions.ADMINISTRATOR)
 @tanjun.as_slash_command("startup", "Ensures your guild is configured for tickets!")
 async def startup_tickets(
     ctx: tanjun.SlashContext,
@@ -190,9 +190,7 @@ async def startup_tickets(
     await ctx.edit_initial_response("Everything is setup!")
 
 
-async def ticket_embed(
-    ctx: tanjun.SlashContext, bot: hikari.GatewayBot
-) -> hikari.Embed:
+async def ticket_embed(_: tanjun.SlashContext, bot: hikari.GatewayBot) -> hikari.Embed:
     """Provides an embed for the tickets channel."""
     description = (
         "If you need help with something you can submit a ticket! A new channel will "
@@ -212,7 +210,7 @@ async def ticket_embed(
 
 
 async def ticket_channel_embed(
-    event: hikari.InteractionCreateEvent, bot: hikari.GatewayBot
+    _: hikari.InteractionCreateEvent, bot: hikari.GatewayBot
 ) -> hikari.Embed:
     """Provides an embed for individual ticket channels."""
     description = (
