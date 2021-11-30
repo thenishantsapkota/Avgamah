@@ -35,7 +35,7 @@ async def delete_message_button(ctx: yuyo.ComponentContext) -> None:
 DELETE_CUSTOM_ID = "AUTHOR_DELETE_BUTTON"
 DELETE_ROW = (
     hikari.impl.ActionRowBuilder()
-    .add_button(hikari.ButtonStyle.DANGER, DELETE_CUSTOM_ID)
-    .set_emoji("\N{HEAVY MULTIPLICATION X}\N{VARIATION SELECTOR-16}")
+    .add_button(hikari.ButtonStyle.SECONDARY, DELETE_CUSTOM_ID)
+    .set_emoji(915250243929509918)
     .add_to_container()
 )
