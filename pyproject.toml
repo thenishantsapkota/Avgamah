@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "hikari-bot"
+name = "Avgamah"
 version = "1.0.0"
 description = ""
 authors = ["Nishant Sapkota"]
