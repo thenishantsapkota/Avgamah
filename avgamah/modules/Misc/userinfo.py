@@ -41,8 +41,8 @@ async def userinfo_command(ctx: tanjun.abc.Context, member: hikari.Member) -> No
     )
     fields = [
         ("ID", member.id, True),
-        ("Joined on", f"<t:{joined_at}:F> • <t:{joined_at}:R>", True),
-        ("Created on", f"<t:{created_at}:F> • <t:{created_at}:R>", True),
+        ("Joined on", f"<t:{joined_at}:F> • <t:{joined_at}:R>", False),
+        ("Created on", f"<t:{created_at}:F> • <t:{created_at}:R>", False),
         ("Nickname", member.nickname if member.nickname else "None", True),
         ("Status", status.title(), True),
         (
