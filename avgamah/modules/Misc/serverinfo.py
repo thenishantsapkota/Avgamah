@@ -25,7 +25,7 @@ async def serverinfo_command(ctx: tanjun.abc.Context) -> None:
         (
             "Server Creation",
             f"<t:{guild.created_at.timestamp():.0f}:F> • <t:{guild.created_at.timestamp():.0f}:R>",
-            True,
+            False,
         ),
         ("Total Channels", len(guild.get_channels()), True),
         ("Boost Count", guild.premium_subscription_count, True),
