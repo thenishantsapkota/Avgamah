@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import typing as t
+from datetime import datetime
 
 import aioredis
 import hikari
@@ -9,7 +10,7 @@ import tanjun
 import yuyo
 from tortoise import Tortoise
 
-from avgamah import TEST_GUILD_ID, __version__
+from avgamah import STDOUT_CHANNEL_ID, TEST_GUILD_ID, __version__
 from avgamah.utils.activity import CustomActivity
 from avgamah.utils.buttons import DELETE_CUSTOM_ID, delete_message_button
 from avgamah.utils.Cache.rashifal_cache import CacheRashifal
@@ -65,6 +66,7 @@ class Bot(hikari.GatewayBot):
         self.event_manager.subscribe(hikari.StartingEvent, self.on_starting)
         self.event_manager.subscribe(hikari.StartedEvent, self.on_started)
         self.event_manager.subscribe(hikari.StoppingEvent, self.on_stopping)
+        self.event_manager.subscribe(hikari.StoppedEvent, self.on_stopped)
 
         super().run()
 
@@ -78,6 +80,7 @@ class Bot(hikari.GatewayBot):
         asyncio.create_task(self.connect_db())
 
     async def on_started(self: _AVGAMAH, _: hikari.StartedEvent) -> None:
+        await self.starting_embed()
         asyncio.create_task(CustomActivity(self).change_status())
         asyncio.create_task(CacheRashifal(self).fetch_rashifal())
         asyncio.create_task(CacheRedditPosts(self).fetch_posts())
@@ -94,3 +97,31 @@ class Bot(hikari.GatewayBot):
 
     async def on_stopping(self: _AVGAMAH, _: hikari.StoppingEvent) -> None:
         logger.info("Bot has stopped.")
+
+    async def on_stopped(self: _AVGAMAH, _: hikari.StoppedEvent) -> None:
+        await self.stopping_embed()
+
+    async def starting_embed(self: _AVGAMAH) -> None:
+        self.stdout_channel = await self.rest.fetch_channel(STDOUT_CHANNEL_ID)
+        embed = (
+            hikari.Embed(color=0x00FF00, timestamp=datetime.now().astimezone())
+            .set_author(
+                name=f"{self.cache.get_me()} has started.",
+                icon=self.cache.get_me().avatar_url,
+            )
+            .set_footer(text="Version 1.0")
+        )
+
+        await self.stdout_channel.send(embed=embed)
+
+    async def stopping_embed(self: _AVGAMAH) -> None:
+        embed = (
+            hikari.Embed(color=0xFF0000, timestamp=datetime.now().astimezone())
+            .set_author(
+                name=f"{self.cache.get_me()} has stopped.",
+                icon=self.cache.get_me().avatar_url,
+            )
+            .set_footer(text="Version 1.0")
+        )
+
+        await self.stdout_channel.send(embed=embed)
