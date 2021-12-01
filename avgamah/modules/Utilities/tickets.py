@@ -34,11 +34,6 @@ async def listen_for_ticket(
             event.interaction.channel_id,
             permission_overwrites=[
                 hikari.PermissionOverwrite(
-                    id=event.interaction.member,
-                    type=1,
-                    deny=hikari.Permissions.VIEW_CHANNEL,
-                ),
-                hikari.PermissionOverwrite(
                     id=event.interaction.guild_id,
                     type=0,
                     deny=hikari.Permissions.VIEW_CHANNEL,
