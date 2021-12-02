@@ -49,7 +49,11 @@ async def botinfo_command(ctx: tanjun.abc.Context) -> None:
         ("Command Handler", f"hikari-tanjun v{tanjun_version}", True),
         ("Uptime", pretty_uptime, True),
         ("CPU Time", pretty_cpu_time, True),
-        ("Memory Usage", f"{mem_usage:,.0f} MiB /{mem_total:,.0f} MiB", True),
+        (
+            "Memory Usage",
+            f"{mem_usage:,.0f} MiB /{mem_total:,.0f} MiB ({((mem_usage/mem_total) * 100):,.1f} %)",
+            False,
+        ),
         ("Prefix", "/", True),
         (
             "Total Guild Channels",
