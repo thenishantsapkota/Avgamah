@@ -137,7 +137,7 @@ async def kick_handler(
     ctx: tanjun.abc.Context, member: hikari.Member, reason: str
 ) -> None:
     """
-    Function that handles kicks.h
+    Function that handles kicks
 
     Parameters
     ----------
@@ -167,3 +167,62 @@ async def kick_handler(
 
     except hikari.ForbiddenError:
         pass
+
+
+async def self_mute_handler(
+    ctx: tanjun.abc.Context, member: hikari.Member, time: float, reason: str
+) -> None:
+    muted_role = await permissions.muted_role_check(ctx, ctx.get_guild())
+    log_channel = await permissions.log_channel_check(ctx, ctx.get_guild())
+    unmutes = []
+    pretty_time = pretty_timedelta(timedelta(seconds=time))
+    booster_role = await permissions.check_booster_role(member)
+
+    if muted_role.id not in member.role_ids:
+        end_time = datetime.now() + timedelta(seconds=time)
+        role_ids = ",".join([str(r) for r in member.role_ids])
+        model, _ = await MuteModel.get_or_create(
+            guild_id=ctx.get_guild().id,
+            member_id=member.id,
+            time=end_time,
+            role_id=role_ids,
+        )
+        await model.save()
+        await member.edit(
+            roles=[muted_role, booster_role], reason="Muted the user"
+        ) if booster_role in member.get_roles() else await member.edit(
+            roles=[muted_role], reason="Muted the user"
+        )
+        embed = hikari.Embed(
+            description=f"🔇 **Muted {member}** [ ID {member.id}]\n📄**Reason:**{reason}",
+            color=0xFF0000,
+            timestamp=datetime.now().astimezone(),
+        )
+        embed.set_footer(text=f"Duration: {pretty_time}")
+        embed.set_thumbnail(member.avatar_url)
+        embed.set_author(
+            name=f"{ctx.member} [ ID {ctx.member.id}]",
+            icon=ctx.member.avatar_url,
+        )
+
+        await log_channel.send(embed=embed)
+        await ctx.respond(f"🔇 **{member} muted themselves for {pretty_time}**")
+
+        if time:
+            unmutes.append(member)
+
+    else:
+        await ctx.respond("Member is already muted!")
+
+    try:
+        await member.send(
+            f"🔇 You muted yourselves from {ctx.get_guild().name} \nReason:{reason}.\nTime: {pretty_time}"
+        )
+
+    except hikari.ForbiddenError:
+        pass
+
+    if len(unmutes):
+        await asyncio.sleep(time)
+        updated_member = ctx.cache.get_member(ctx.guild_id, member.id)
+        await unmute_handler(ctx, updated_member)
