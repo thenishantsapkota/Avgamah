@@ -58,7 +58,7 @@ class CacheRashifal:
                 .set_author(name=rashifal["author"], icon=ctx.cache.get_me().avatar_url)
                 .set_footer(text=f"Page {index + 1}"),
             )
-            for index, line in enumerate(_chunk(iterator, 8))
+            for index, line in enumerate(_chunk(iterator, 5))
         )
 
         await paginate(ctx, fields, 180)
