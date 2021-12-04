@@ -25,8 +25,8 @@ class CustomActivity:
                     url="https://www.youtube.com/watch?v=dQw4w9WgXcQ",
                 ),
                 hikari.Activity(
-                    type=hikari.ActivityType.PLAYING,
-                    name="https://discord.avgamah.org",
+                    type=hikari.ActivityType.COMPETING,
+                    name=f"in {len(self.bot.cache.get_available_guilds_view().values())} servers.",
                 ),
                 hikari.Activity(
                     type=hikari.ActivityType.WATCHING,
