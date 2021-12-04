@@ -26,11 +26,11 @@ class CustomActivity:
                 ),
                 hikari.Activity(
                     type=hikari.ActivityType.COMPETING,
-                    name=f"in {len(self.bot.cache.get_available_guilds_view().values())} servers.",
+                    name=f"{len(self.bot.cache.get_available_guilds_view().values())} servers.",
                 ),
                 hikari.Activity(
                     type=hikari.ActivityType.WATCHING,
-                    name=f"{len(self.bot.cache.get_members_view())} members",
+                    name=f"{len(self.bot.cache.get_members_view().values())} members",
                 ),
                 hikari.Activity(
                     type=hikari.ActivityType.WATCHING,
