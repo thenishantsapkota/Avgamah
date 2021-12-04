@@ -30,6 +30,10 @@ class CustomActivity:
                 ),
                 hikari.Activity(
                     type=hikari.ActivityType.WATCHING,
+                    name=f"{len(self.bot.cache.get_members_view())} members",
+                ),
+                hikari.Activity(
+                    type=hikari.ActivityType.WATCHING,
                     name="Slash Commands are here!!",
                 ),
                 hikari.Activity(
