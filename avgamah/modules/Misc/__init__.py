@@ -26,4 +26,4 @@ zodiac_signs = {
     "aquarius": "कुम्भ",
     "pisces": "मीन",
 }
-times = {"daily": 0, "weekly": 1, "monthly": 2, "yearly": 3}
+times = {0: "daily", 1: "weekly", 2: "monthly", 3: "yearly"}
