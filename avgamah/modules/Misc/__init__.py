@@ -12,17 +12,18 @@ application_ids = {
 
 activities = list(application_ids.keys())
 
-zodiac_signs = [
-    "aries",
-    "taurus",
-    "gemini",
-    "cancer",
-    "leo",
-    "virgo",
-    "libra",
-    "scorpio",
-    "sagittarius",
-    "capricorn",
-    "aquarius",
-    "pisces",
-]
+zodiac_signs = {
+    "aries": "मेष",
+    "taurus": "वृष",
+    "gemini": "मिथुन",
+    "cancer": "कर्कट",
+    "leo": "सिंह",
+    "virgo": "कन्या",
+    "libra": "तुला",
+    "scorpio": "वृश्चिक",
+    "sagittarius": "धनु",
+    "capricorn": "मकर",
+    "aquarius": "कुम्भ",
+    "pisces": "मीन",
+}
+times = {"daily": 0, "weekly": 1, "monthly": 2, "yearly": 3}
