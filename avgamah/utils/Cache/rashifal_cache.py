@@ -52,7 +52,7 @@ class CacheRashifal:
                 hikari.UNDEFINED,
                 hikari.Embed(
                     title=f"{zodiac_signs[zodiac]}({zodiac.title()})",
-                    description="\n".join(line),
+                    description="।\n".join(line),
                     color=0x00FF00,
                 )
                 .set_author(name=rashifal["author"], icon=ctx.cache.get_me().avatar_url)
