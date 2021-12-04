@@ -7,7 +7,7 @@ import aiohttp
 import hikari
 import tanjun
 
-from avgamah.modules.Misc import zodiac_signs
+from avgamah.modules.Misc import times, zodiac_signs
 from avgamah.utils.pagination import paginate
 from avgamah.utils.utilities import _chunk
 
@@ -45,13 +45,16 @@ class CacheRashifal:
         self, ctx: tanjun.abc.Context, zodiac: str, duration: str
     ) -> None:
         data = await self.get_rashifal()
-        rashifal = data["np"][duration]
+        time_values = list(times.values())
+        time_keys = list(times.keys())
+        _index = time_values.index(duration)
+        rashifal = data["np"][_index]
         iterator = str(rashifal[zodiac]).split("।")
         fields = (
             (
                 hikari.UNDEFINED,
                 hikari.Embed(
-                    title=f"{zodiac_signs[zodiac]}({zodiac.title()})",
+                    title=f"{zodiac_signs[zodiac]}({zodiac.title()}) - {time_values[_index].title()} Rashifal",
                     description="।\n".join(line),
                     color=0x00FF00,
                 )
