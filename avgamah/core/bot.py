@@ -82,7 +82,7 @@ class Bot(hikari.GatewayBot):
     async def on_started(self: _AVGAMAH, _: hikari.StartedEvent) -> None:
         await self.starting_embed()
         asyncio.create_task(CustomActivity(self).change_status())
-        asyncio.create_task(CacheRashifal(self).fetch_rashifal())
+        asyncio.create_task(CacheRashifal(self).rashifal_job())
         asyncio.create_task(CacheRedditPosts(self).fetch_posts())
         builder = (
             lavasnek_rs.LavalinkBuilder(self.get_me().id, bot_config.token)
