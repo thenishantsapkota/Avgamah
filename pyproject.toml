@@ -27,7 +27,7 @@ uvloop = "^0.16.0"
 httpx = "^0.21.1"
 
 [tool.poetry.dev-dependencies]
-black = "^21.11b1"
+black = "^21.12b0"
 isort = "^5.10.1"
 pre-commit = "^2.15.0"
 flake8 = "^4.0.1"
