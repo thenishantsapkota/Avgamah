@@ -10,7 +10,7 @@ python = ">=3.9,<3.11"
 python-dotenv = "^0.19.2"
 aiohttp = "^3.8.1"
 aerich = "0.5.3"
-tortoise-orm = "0.17.4"
+tortoise-orm = "0.18.1"
 asyncpg = "^0.24.0"
 hikari = {git = "https://github.com/hikari-py/hikari"}
 hikari-tanjun = {git = "https://github.com/FasterSpeeding/Tanjun"}
