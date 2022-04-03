@@ -31,7 +31,7 @@ async def botinfo_command(ctx: tanjun.abc.Context) -> None:
         pretty_uptime = pretty_timedelta(uptime)
         cpu_time = timedelta(seconds=(cpu := proc.cpu_times()).system + cpu.user)
         pretty_cpu_time = pretty_timedelta(cpu_time)
-        mem_total = virtual_memory().total / (1024 ** 2)
+        mem_total = virtual_memory().total / (1024**2)
         mem_of_total = proc.memory_percent()
         mem_usage = mem_total * (mem_of_total / 100)
 
