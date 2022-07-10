@@ -21,7 +21,7 @@ hikari-yuyo = {git= "https://github.com/FasterSpeeding/Yuyo"}
 lavasnek-rs = "^0.1.0-alpha.1"
 nepali-date = "^2.0.5"
 spotipy = "^2.19.0"
-aioredis = "^2.0.0"
+aioredis = "^2.0.1"
 asyncpraw = "^7.5.0"
 uvloop = "^0.16.0"
 httpx = "^0.21.1"
