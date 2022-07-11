@@ -659,11 +659,11 @@ test = ["appdirs (==1.4.4)", "pytest (>=6)", "pytest-cov (>=2.7)", "pytest-mock 
 
 [[package]]
 name = "pre-commit"
-version = "2.15.0"
+version = "2.20.0"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 category = "dev"
 optional = false
-python-versions = ">=3.6.1"
+python-versions = ">=3.7"
 
 [package.dependencies]
 cfgv = ">=2.0.0"
@@ -963,7 +963,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.11"
-content-hash = "dbb8b07e746132843eb856d1ff097058ee42085fbec271d2b9d7bf2ab2b7fc7a"
+content-hash = "ccc02d8e654b1cdd38e851a1f468c66fc32e737fcd6eee988b45f8fe806ed50b"
 
 [metadata.files]
 aerich = []
