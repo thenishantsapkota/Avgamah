@@ -9,7 +9,7 @@ license = "MIT"
 python = ">=3.9,<3.11"
 python-dotenv = "^0.19.2"
 aiohttp = "^3.8.1"
-aerich = "0.5.3"
+aerich = "0.6.3"
 tortoise-orm = "0.17.4"
 asyncpg = "^0.24.0"
 hikari = {git = "https://github.com/hikari-py/hikari"}
