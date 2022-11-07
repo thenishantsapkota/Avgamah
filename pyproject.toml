@@ -16,7 +16,7 @@ hikari = {git = "https://github.com/hikari-py/hikari"}
 hikari-tanjun = {git = "https://github.com/FasterSpeeding/Tanjun"}
 APScheduler = "^3.8.1"
 bs4 = "^0.0.1"
-psutil = "^5.8.0"
+psutil = "^5.9.4"
 hikari-yuyo = {git= "https://github.com/FasterSpeeding/Yuyo"}
 lavasnek-rs = "^0.1.0-alpha.1"
 nepali-date = "^2.0.5"
